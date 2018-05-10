@@ -36,7 +36,137 @@ BEGIN
 END;
 /
 
+--------------------------------------------------------
+--  DDL for Procedure SP_UPDATE_MULTI_SELECT
+--------------------------------------------------------
 
+create or replace PROCEDURE SP_UPDATE_MULTI_SELECT(
+    I_TRANSACTIONID IN NUMBER
+    ,I_FORM_NAME       IN  VARCHAR2
+    ,I_FIELD_NAME      IN  VARCHAR2
+    ,I_TABLE_NAME      IN VARCHAR2
+)
+IS
+
+V_M_VALUE         VARCHAR2(1000);
+V_Q_EXEC          VARCHAR2(1200);
+
+BEGIN
+    --V_Q_EXEC := 'SELECT ' || I_FIELD_NAME || ' INTO ' || V_M_VALUE || ' FROM ' || I_TABLE_NAME || ' WHERE TRANSACTION_ID = ' || I_TRANSACTIONID;
+    
+    
+    BEGIN
+    
+        V_Q_EXEC := 'SELECT ' || I_FIELD_NAME || ' FROM ' || I_TABLE_NAME || ' WHERE TRANSACTION_ID = ' || I_TRANSACTIONID;
+        execute immediate V_Q_EXEC INTO V_M_VALUE;
+        
+        --SELECT ARP_STEP_DETERMINATION into V_M_VALUE FROM whrsc.APPOINTMENT WHERE TRANSACTION_ID = I_TRANSACTIONID;
+        
+        DBMS_OUTPUT.PUT_LINE('ERROR 1 -------------------');
+        
+        
+    EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+            --DBMS_OUTPUT.PUT_LINE('ERROR 222 -------------------');
+                V_M_VALUE := '';
+	END;
+      
+    BEGIN
+        
+            DELETE FROM FORMS_FIELDS WHERE TRANSACTION_ID = I_TRANSACTIONID AND FORM_NAME = I_FORM_NAME AND FIELD_NAME = I_FIELD_NAME;
+            --DBMS_OUTPUT.PUT_LINE('ERROR 3 -------------------');
+    END;
+    
+    --DBMS_OUTPUT.PUT_LINE('E -------------------' || V_M_VALUE);
+    IF  V_M_VALUE is not Null AND Length(V_M_VALUE) > 0 THEN
+       -- DBMS_OUTPUT.PUT_LINE('if check -------------------');
+     
+        --DBMS_OUTPUT.PUT_LINE('ERROR 4 -------------------');
+        
+        BEGIN
+    
+            INSERT INTO FORMS_FIELDS (TRANSACTION_ID, FORM_NAME, FIELD_NAME, VALUE)
+            SELECT  I_TRANSACTIONID AS Transaction_ID, I_FORM_NAME AS Form_Name, I_FIELD_NAME AS Field_Name, SUBSTR (COL,
+                   INSTR (COL, ',', 1, LEVEL) + 1,
+                   INSTR (COL, ',', 1, LEVEL + 1) - INSTR (COL, ',', 1, LEVEL)
+                   - 1) AS COL
+            FROM (SELECT ',' || V_M_VALUE || ',' AS COL
+                          FROM DUAL)
+            CONNECT BY LEVEL <= LENGTH (COL) - LENGTH (REPLACE (COL, ',')) - 1;
+            
+            --DBMS_OUTPUT.PUT_LINE('ERROR 5 -------------------');
+        
+        
+        END;
+     
+    END IF;
+
+	COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('ERROR 6 -------------------');
+        RAISE_APPLICATION_ERROR(-20905, 'INSERT FORMS_FIELDS TABLE: Invalid data.  I_TRANSACTIONID = '
+		|| TO_CHAR(I_TRANSACTIONID));
+    
+END;
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_UPDATE_MULTI_SELECT_RATER
+--------------------------------------------------------
+
+create or replace PROCEDURE SP_UPDATE_MULTI_SELECT_RATER
+(
+    I_TRANSACTIONID IN NUMBER
+    ,I_FORM_NAME       IN  VARCHAR2
+    ,I_FIELD_VALUE      IN  VARCHAR2
+    ,I_ANN_NUMBER      IN VARCHAR2
+)
+
+IS
+
+BEGIN
+    --V_Q_EXEC := 'SELECT ' || I_FIELD_NAME || ' INTO ' || V_M_VALUE || ' FROM ' || I_TABLE_NAME || ' WHERE TRANSACTION_ID = ' || I_TRANSACTIONID;
+    
+      
+    BEGIN
+        
+            DELETE FROM FORMS_FIELDS WHERE TRANSACTION_ID = I_TRANSACTIONID AND FORM_NAME = I_FORM_NAME AND FIELD_NAME = 'RATER' AND ANN_NUMBER = I_ANN_NUMBER;
+            --DBMS_OUTPUT.PUT_LINE('ERROR 3 -------------------');
+    END;
+    
+    --DBMS_OUTPUT.PUT_LINE('E -------------------' || V_M_VALUE);
+    IF  I_FIELD_VALUE is not Null AND Length(I_FIELD_VALUE) > 0 THEN
+       -- DBMS_OUTPUT.PUT_LINE('if check -------------------');
+     
+        --DBMS_OUTPUT.PUT_LINE('ERROR 4 -------------------');
+        
+        BEGIN
+    
+            INSERT INTO FORMS_FIELDS (TRANSACTION_ID, FORM_NAME, FIELD_NAME, ANN_NUMBER, VALUE)
+            SELECT  I_TRANSACTIONID AS Transaction_ID, I_FORM_NAME AS Form_Name, 'RATER' AS Field_Name, I_ANN_NUMBER AS Ann_Number, SUBSTR (COL,
+                   INSTR (COL, ',', 1, LEVEL) + 1,
+                   INSTR (COL, ',', 1, LEVEL + 1) - INSTR (COL, ',', 1, LEVEL)
+                   - 1) AS COL
+            FROM (SELECT ',' || I_FIELD_VALUE || ',' AS COL
+                          FROM DUAL)
+            CONNECT BY LEVEL <= LENGTH (COL) - LENGTH (REPLACE (COL, ',')) - 1;
+            
+            --DBMS_OUTPUT.PUT_LINE('ERROR 5 -------------------');
+        
+        
+        END;
+     
+    END IF;
+
+	COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('ERROR 6 -------------------');
+        RAISE_APPLICATION_ERROR(-20905, 'INSERT FORMS_FIELDS TABLE: Invalid data.  I_TRANSACTIONID = '
+		|| TO_CHAR(I_TRANSACTIONID));
+  
+END;
+/
 --------------------------------------------------------
 --  DDL for Procedure SP_UPDATE_PV_DETERMINE
 --------------------------------------------------------
@@ -2991,137 +3121,7 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
 			--DBMS_OUTPUT.PUT_LINE('Error message = ' || V_ERRMSG);
 	END;
 /
---------------------------------------------------------
---  DDL for Procedure SP_UPDATE_MULTI_SELECT
---------------------------------------------------------
 
-create or replace PROCEDURE SP_UPDATE_MULTI_SELECT(
-    I_TRANSACTIONID IN NUMBER
-    ,I_FORM_NAME       IN  VARCHAR2
-    ,I_FIELD_NAME      IN  VARCHAR2
-    ,I_TABLE_NAME      IN VARCHAR2
-)
-IS
-
-V_M_VALUE         VARCHAR2(1000);
-V_Q_EXEC          VARCHAR2(1200);
-
-BEGIN
-    --V_Q_EXEC := 'SELECT ' || I_FIELD_NAME || ' INTO ' || V_M_VALUE || ' FROM ' || I_TABLE_NAME || ' WHERE TRANSACTION_ID = ' || I_TRANSACTIONID;
-    
-    
-    BEGIN
-    
-        V_Q_EXEC := 'SELECT ' || I_FIELD_NAME || ' FROM ' || I_TABLE_NAME || ' WHERE TRANSACTION_ID = ' || I_TRANSACTIONID;
-        execute immediate V_Q_EXEC INTO V_M_VALUE;
-        
-        --SELECT ARP_STEP_DETERMINATION into V_M_VALUE FROM whrsc.APPOINTMENT WHERE TRANSACTION_ID = I_TRANSACTIONID;
-        
-        DBMS_OUTPUT.PUT_LINE('ERROR 1 -------------------');
-        
-        
-    EXCEPTION
-            WHEN NO_DATA_FOUND THEN
-            --DBMS_OUTPUT.PUT_LINE('ERROR 222 -------------------');
-                V_M_VALUE := '';
-	END;
-      
-    BEGIN
-        
-            DELETE FROM FORMS_FIELDS WHERE TRANSACTION_ID = I_TRANSACTIONID AND FORM_NAME = I_FORM_NAME AND FIELD_NAME = I_FIELD_NAME;
-            --DBMS_OUTPUT.PUT_LINE('ERROR 3 -------------------');
-    END;
-    
-    --DBMS_OUTPUT.PUT_LINE('E -------------------' || V_M_VALUE);
-    IF  V_M_VALUE is not Null AND Length(V_M_VALUE) > 0 THEN
-       -- DBMS_OUTPUT.PUT_LINE('if check -------------------');
-     
-        --DBMS_OUTPUT.PUT_LINE('ERROR 4 -------------------');
-        
-        BEGIN
-    
-            INSERT INTO FORMS_FIELDS (TRANSACTION_ID, FORM_NAME, FIELD_NAME, VALUE)
-            SELECT  I_TRANSACTIONID AS Transaction_ID, I_FORM_NAME AS Form_Name, I_FIELD_NAME AS Field_Name, SUBSTR (COL,
-                   INSTR (COL, ',', 1, LEVEL) + 1,
-                   INSTR (COL, ',', 1, LEVEL + 1) - INSTR (COL, ',', 1, LEVEL)
-                   - 1) AS COL
-            FROM (SELECT ',' || V_M_VALUE || ',' AS COL
-                          FROM DUAL)
-            CONNECT BY LEVEL <= LENGTH (COL) - LENGTH (REPLACE (COL, ',')) - 1;
-            
-            --DBMS_OUTPUT.PUT_LINE('ERROR 5 -------------------');
-        
-        
-        END;
-     
-    END IF;
-
-	COMMIT;
-EXCEPTION
-    WHEN OTHERS THEN
-    DBMS_OUTPUT.PUT_LINE('ERROR 6 -------------------');
-        RAISE_APPLICATION_ERROR(-20905, 'INSERT FORMS_FIELDS TABLE: Invalid data.  I_TRANSACTIONID = '
-		|| TO_CHAR(I_TRANSACTIONID));
-    
-END;
-/
---------------------------------------------------------
---  DDL for Procedure SP_UPDATE_MULTI_SELECT_RATER
---------------------------------------------------------
-
-create or replace PROCEDURE SP_UPDATE_MULTI_SELECT_RATER
-(
-    I_TRANSACTIONID IN NUMBER
-    ,I_FORM_NAME       IN  VARCHAR2
-    ,I_FIELD_VALUE      IN  VARCHAR2
-    ,I_ANN_NUMBER      IN VARCHAR2
-)
-
-IS
-
-BEGIN
-    --V_Q_EXEC := 'SELECT ' || I_FIELD_NAME || ' INTO ' || V_M_VALUE || ' FROM ' || I_TABLE_NAME || ' WHERE TRANSACTION_ID = ' || I_TRANSACTIONID;
-    
-      
-    BEGIN
-        
-            DELETE FROM FORMS_FIELDS WHERE TRANSACTION_ID = I_TRANSACTIONID AND FORM_NAME = I_FORM_NAME AND FIELD_NAME = 'RATER' AND ANN_NUMBER = I_ANN_NUMBER;
-            --DBMS_OUTPUT.PUT_LINE('ERROR 3 -------------------');
-    END;
-    
-    --DBMS_OUTPUT.PUT_LINE('E -------------------' || V_M_VALUE);
-    IF  I_FIELD_VALUE is not Null AND Length(I_FIELD_VALUE) > 0 THEN
-       -- DBMS_OUTPUT.PUT_LINE('if check -------------------');
-     
-        --DBMS_OUTPUT.PUT_LINE('ERROR 4 -------------------');
-        
-        BEGIN
-    
-            INSERT INTO FORMS_FIELDS (TRANSACTION_ID, FORM_NAME, FIELD_NAME, ANN_NUMBER, VALUE)
-            SELECT  I_TRANSACTIONID AS Transaction_ID, I_FORM_NAME AS Form_Name, 'RATER' AS Field_Name, I_ANN_NUMBER AS Ann_Number, SUBSTR (COL,
-                   INSTR (COL, ',', 1, LEVEL) + 1,
-                   INSTR (COL, ',', 1, LEVEL + 1) - INSTR (COL, ',', 1, LEVEL)
-                   - 1) AS COL
-            FROM (SELECT ',' || I_FIELD_VALUE || ',' AS COL
-                          FROM DUAL)
-            CONNECT BY LEVEL <= LENGTH (COL) - LENGTH (REPLACE (COL, ',')) - 1;
-            
-            --DBMS_OUTPUT.PUT_LINE('ERROR 5 -------------------');
-        
-        
-        END;
-     
-    END IF;
-
-	COMMIT;
-EXCEPTION
-    WHEN OTHERS THEN
-    DBMS_OUTPUT.PUT_LINE('ERROR 6 -------------------');
-        RAISE_APPLICATION_ERROR(-20905, 'INSERT FORMS_FIELDS TABLE: Invalid data.  I_TRANSACTIONID = '
-		|| TO_CHAR(I_TRANSACTIONID));
-  
-END;
-/
 
 --------------------------------------------------------
 --  DDL for Procedure SP_UPDATE_FORM_DATA
