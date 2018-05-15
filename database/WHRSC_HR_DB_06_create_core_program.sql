@@ -8,33 +8,6 @@
 --------------------------------------------------------
 SET DEFINE OFF;
 
-create or replace PROCEDURE SP_ERROR_LOG
-IS
-	PRAGMA AUTONOMOUS_TRANSACTION;
-	V_CODE      PLS_INTEGER := SQLCODE;
-	V_MSG       VARCHAR2(32767) := SQLERRM;
-BEGIN
-	INSERT INTO ERROR_LOG
-	(
-		ERROR_CD
-		, ERROR_MSG
-		, BACKTRACE
-		, CALLSTACK
-		, CRT_DT
-		, CRT_USR
-	)
-	VALUES (
-		V_CODE
-		, V_MSG
-		, SYS.DBMS_UTILITY.FORMAT_ERROR_BACKTRACE
-		, SYS.DBMS_UTILITY.FORMAT_CALL_STACK
-		, SYSDATE
-		, USER
-	);
-
-	COMMIT;
-END;
-/
 
 --------------------------------------------------------
 --  DDL for Procedure SP_UPDATE_MULTI_SELECT

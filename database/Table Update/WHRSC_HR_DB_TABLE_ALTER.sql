@@ -1,0 +1,5 @@
+ALTER TABLE CHR_EMPLOYEE_INFO 
+modify
+   (
+   GRADE VARCHAR2 (30)
+   );

@@ -336,7 +336,7 @@ CREATE TABLE CHR_EMPLOYEE_INFO
    JOB_TITLE         VARCHAR2(80),
    PAY_PLAN	         VARCHAR2(10),
    OCC_SERIES	      VARCHAR2(30),
-   GRADE	            VARCHAR2(10),
+   GRADE	            VARCHAR2(30),
    STEP	            VARCHAR2(10),
    SALARY	         VARCHAR2(50),
    ANNUAL_RT	      VARCHAR2(50),
