@@ -3,3 +3,9 @@ modify
    (
    GRADE VARCHAR2 (30)
    );
+
+ALTER TABLE RDR_ATTACH 
+modify
+   (
+   PROGRAM VARCHAR2(20)
+   );
