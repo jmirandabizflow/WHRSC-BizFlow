@@ -54,7 +54,6 @@ Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Incentives Offered','Recruit Incentive',null,';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Incentives Offered','Relocation Incentive',null,';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Incentives Offered','Student Loan Repayment Program',null,';ALL;',null,null);
-Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Incentives Offered','N/A',null,';ALL;',1000,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('statDescList','Recruitment Pending Classification',';Active in HR;',';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('WiTS Roles Type','IC User',null,'IC User;HR;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('statDescList','Assessment under review/approval (HR)',';Active in HR;',';ALL;',null,null);
@@ -260,11 +259,9 @@ Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Additional Recruit Channels','Website/Journal/Newspaper',null,';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Additional Recruit Channels','Comm Corp liserv',null,';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Additional Recruit Channels','HHSC Diversity Notification',null,';ALL;',null,null);
-Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Additional Recruit Channels','Slideshow Job on Jobs@NIH',null,';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Additional Recruit Channels','USAJOBS Featured Job',null,';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Additional Recruit Channels','School/University Posting',null,';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Additional Recruit Channels','Other',null,';ALL;',null,null);
-Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Additional Recruit Channels','N/A',null,';ALL;',-5,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Announcement Type',null,null,';Hide;Cache-ALL:LA;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Area of Consideration','HHS-wide',null,';ALL;',4,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('Announcement Type','MP',null,';ALL;',2,null);
