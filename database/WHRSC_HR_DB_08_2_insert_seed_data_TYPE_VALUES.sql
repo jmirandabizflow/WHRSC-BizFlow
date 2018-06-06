@@ -528,7 +528,6 @@ Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('hireTypeList','Student-SCEP (Summer)',null,';Hide;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('hireTypeList','Student-Intern',null,';Hide;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('hireTypeList','Student-Intern (Summer)',null,';Hide;',null,null);
-Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('hireTypeList','Reappointment',null,';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('indivGroupList','Individual',null,';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('indivGroupList','Group',null,';ALL;',null,null);
 Insert into HHS_WHRSC_HR.TYPE_values (TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values('awardCategoryList','Administrative',null,';ALL;',null,null);
