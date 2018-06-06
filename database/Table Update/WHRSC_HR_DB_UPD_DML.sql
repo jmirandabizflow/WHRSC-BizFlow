@@ -21,3 +21,5 @@ UPDATE HHS_WHRSC_HR.type_values SET type_value = 'WHRSC' WHERE type_name = 'Prog
 UPDATE HHS_WHRSC_HR.rdr_approval SET program = 'WHRSC' WHERE program = 'HHS_WHRSC_HR';
 
 Insert into HHS_WHRSC_HR.TYPE_VALUES (REPL_ID,TYPE_NAME,TYPE_VALUE,CONDITION_1,CONDITION_2,DISP_ORDER,TYPE_CODE) values (null,'hireTypeList','Reappointment',null,';ALL;',null,null);
+
+Delete FROM HHS_WHRSC_HR.type_values Where type_name = 'hireTypeList' And type_value = 'Reappointment';
