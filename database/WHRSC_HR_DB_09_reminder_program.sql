@@ -367,6 +367,126 @@ END FN_GET_RECRUITMENT_SLA_VACAN;
 /
 
 --------------------------------------------------------
+--  DDL for Function FN_GET_RECRUITMENT_EMAIL_TB_AP
+--------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION FN_GET_RECRUITMENT_EMAIL_TB_AP 
+(I_WITS_ID IN VARCHAR2, 
+ I_POS_TYPE IN VARCHAR2, 
+ I_ANNCERTNUMS IN VARCHAR2)
+RETURN VARCHAR2 AS 
+
+V_TABLETOP VARCHAR2(4000);
+V_TABLEBOTTOM VARCHAR2(4000);
+V_WITSNUMBER VARCHAR2(10);
+V_ADMINOFFICERNAME VARCHAR2(100);
+V_SELECTINGOFFICIALNAME VARCHAR2(100);
+V_IC VARCHAR2(10);
+V_ORGINITS VARCHAR2(50);
+V_ADMINCODE VARCHAR2(50);
+V_POSITIONTITLE VARCHAR2(100);
+V_PAYPLAN VARCHAR2(100);
+V_SERIES VARCHAR2(100);
+V_GRADE VARCHAR2(100);
+V_ANNNUMBER VARCHAR2(100);
+V_POSITIONS VARCHAR2(100);
+V_ALL_POSITIONS VARCHAR2(8000) := '';
+V_COUNT INT;
+V_TYPE VARCHAR2(10);
+
+CURSOR CUR_POSITIONS IS	 
+
+    SELECT DISTINCT 
+		A.TRANSACTION_ID,
+		UPPER (NVL(D.IC_CONTACT_FIRST_NAME, '')) || ' ' || UPPER (NVL(D.IC_CONTACT_LAST_NAME, 'Not Available')),
+		UPPER (NVL(D.PROGRAM_MGR_FIRST_NAME, '')) || ' ' || UPPER (NVL(D.PROGRAM_MGR_LAST_NAME, 'Not Available')),
+		NVL(O.IC, ''),
+		NVL(O.ORG_INITS, ''),
+		NVL(O.ADMIN_CODE, ''),
+		NVL(C.POSITION_TITLE, '[Not Available]'),
+		NVL(C.PAY_PLAN, '[Not Available]'),
+		NVL(C.SERIES,  '[Not Available]'),
+		NVL(C.GRADE, '[Not Available]'),
+		NVL(B.ANN_NUMBER, '[Announcement Number Not Available]' )
+
+		FROM 
+		MAIN A /*(NOLOCK)*/
+		INNER JOIN ORGS O /*(NOLOCK)*/ ON O.ADMIN_CODE = A.ADMIN_CODE
+		LEFT JOIN NEW_POSITION C /*(NOLOCK)*/ ON C.TRANSACTION_ID = A.TRANSACTION_ID /*AND C.[TYPE] = 'Approved'*/
+		LEFT JOIN IC_REQUEST_INFO D ON A.TRANSACTION_ID = D.TRANSACTION_ID
+		LEFT JOIN CERTIFICATE B ON B.TRANSACTION_ID = A.TRANSACTION_ID 
+		WHERE A.TRANSACTION_ID = I_WITS_ID;
+
+BEGIN
+
+    OPEN CUR_POSITIONS;  
+
+    LOOP
+      FETCH CUR_POSITIONS INTO
+        V_WITSNUMBER ,
+        V_ADMINOFFICERNAME ,
+        V_SELECTINGOFFICIALNAME ,
+        V_IC ,
+        V_ORGINITS ,
+        V_ADMINCODE ,
+        V_POSITIONTITLE ,
+        V_PAYPLAN ,
+        V_SERIES ,
+        V_GRADE ,
+        V_ANNNUMBER;
+      EXIT WHEN CUR_POSITIONS%NOTFOUND;
+
+      V_ALL_POSITIONS := V_ALL_POSITIONS ||	
+		'<html>  ' ||
+		'<body>   ' ||
+		'<table border="1" bordercolor="#BDBDBD" style="background-color:#FFFFFF" cellpadding="2" cellspacing="2"><font face=" Calibri" size="2">									' ||
+		'<tr>    												'||
+		'<td style="width: 170px">        						'||
+		'<font face=" Calibri" size="2"><strong>Request #</strong></td>						'||
+		'<td style="width: 200px;"><font face=" Calibri" size="2">' || V_WITSNUMBER || '</td>			'||
+		'</tr>													'||
+		'<tr>    												'||
+		'<td style="width: 170px">        						'||
+		'<font face=" Calibri" size="2"><strong>Vacancy Announcement #</strong></td>					'||
+		'<td style="width: 200px;"><font face=" Calibri" size="2">'|| V_ANNNUMBER ||'</td>			'||
+		'</tr>													'||
+		'<tr>    												'||
+		'<td style="width: 170px">        						'||
+		'<font face=" Calibri" size="2"><strong>Submitted By/Org</strong></td>					'||
+		'<td style="width: 200px;"><font face=" Calibri" size="2">'|| V_ADMINOFFICERNAME || ' /<!--<br> ' || V_IC || ' -->' || V_ORGINITS || '</td>			'||
+		'</tr>													'||
+		'<tr>    												'||
+		'<td style="width: 170px">        						'||
+		'<font face=" Calibri" size="2"><strong>Admin Code</strong></td>					'||
+		'<td style="width: 200px;"><font face=" Calibri" size="2">'|| V_ADMINCODE ||'</td>	'||
+		'</tr>													'||
+		'<!--<tr>													'||
+		'<td style="width: 170px">    							'||
+		'<font face=" Calibri" size="2"><strong> Position Title</strong></td>							'||	
+		'<td style="width: 200px"><font face=" Calibri" size="2">'|| V_POSITIONTITLE || '</td>			'||
+		'</tr>													'||
+		'<tr>													'||
+		'<td style="width: 170px">    							'||
+		'<font face=" Calibri" size="2"><strong>Pay Plan/Series/Grade(s)</strong></td>							'||	
+		'<td style="width: 200px"><font face=" Calibri" size="2">' || V_PAYPLAN || '/' || V_SERIES || '/' || V_GRADE || '</td>			'||
+		'</tr>-->													'||
+		'</table>												'||	
+		'<br>'   ||
+
+		'</table></body></html>';
+
+
+
+	END LOOP;  
+	CLOSE CUR_POSITIONS;
+
+
+  RETURN V_ALL_POSITIONS;
+END FN_GET_RECRUITMENT_EMAIL_TB_AP;
+
+/
+
+--------------------------------------------------------
 --  DDL for Procedure SP_SEND_MAIL
 --------------------------------------------------------
 
@@ -997,4 +1117,410 @@ BEGIN
     CLOSE CUR_RECIPIENTS;
   NULL;
 END SP_JOB_RECRUITMENT_SLA_POST;
+/
+
+--------------------------------------------------------
+--  DDL for Procedure SP_JOB_RECRUITMENT_SLA_CERT_EX
+--------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_JOB_RECRUITMENT_SLA_CERT_EX AS 
+
+V_SENDER VARCHAR2(100);
+V_TORECIPIENTS VARCHAR2 (500);
+V_CCRECIPIENTS VARCHAR2 (500);
+V_BCRECIPIENTS VARCHAR2 (500);
+V_SUBJECT VARCHAR2 (500);
+V_CONTENTTOP VARCHAR2(4000);
+V_CONTENTBOTTOM VARCHAR2(4000);
+V_TABLE CLOB;
+V_BODY VARCHAR2(4000);
+V_DAYS VARCHAR2 (50);
+V_WITSNUMBER VARCHAR2 (10);
+V_HRSNAME VARCHAR2 (400);
+V_HRSEMAIL VARCHAR2 (200);
+V_SOEMAIL VARCHAR2 (200);
+V_AOEMAIL VARCHAR2 (200);
+V_COUNT INT;
+V_CERTNUM VARCHAR2 (200);
+V_ANNTYPE VARCHAR2 (20);
+V_ANNNUM VARCHAR2 (80);
+V_DATEISSUED VARCHAR2 (50);
+V_DATECERTSENT VARCHAR2 (50);
+V_DATEEXPIRES VARCHAR2 (50);
+V_DATECLOSE VARCHAR2 (50);
+V_POSTITLE VARCHAR2 (400);
+V_PAYPLAN VARCHAR2 (100);
+V_SERIES VARCHAR2 (100);
+V_GRADE VARCHAR2 (100);
+V_ADMINCODE VARCHAR2 (100);
+V_ORGINITS VARCHAR2 (100);
+V_IC VARCHAR2 (100);
+
+CURSOR CUR_RECIPIENTS IS	 
+---------QUERY----------------
+SELECT DISTINCT 
+A.TRANSACTION_ID,
+--NVL(H.SHORTNAME,'') || ' '  || DBO.FN_GET_NAME_FROM_MEMBERTBL (H.NAME)HRSNAME, 
+H.NAME HRSNAME, 
+NVL((SELECT NVL(EMAIL, '') FROM BIZFLOW.MEMBER WHERE MEMBERID = HR_SPECIALIST_ID),'')HRSEMAIL,
+NVL(I.PROGRAM_MGR_EMAIL, '') SO,
+NVL(I.IC_CONTACT_EMAIL, '') AO,
+--DATEDIFF(DAY,GETDATE(), NVL(DATE_NEW_CERT_EXPIRES, DATE_CERT_EXPIRES)) AS DATEDIFFTODAYTOEXPIRE,
+TRUNC(((TO_DATE(NVL(DATE_NEW_CERT_EXPIRES, DATE_CERT_EXPIRES),'DD-MON-YY') - SYSDATE) + 1)) DATEDIFFTODAYTOEXPIRE,
+NVL(CERT_NUMBER, '[Certificate Number Not Available]') AS CERTIFICATE_NUMBER, 
+--NVL(D.ANN_TYPE, '[NOT AVAILABLE]') AS ANNOUNCEMENT_TYPE,
+'[Not Available]' AS ANNOUNCEMENT_TYPE,
+NVL(X.ANN_NUMBER, '[Not Available]') AS ANNOUNCEMENT_NUMBER, 
+NVL(TO_CHAR(DATE_CERT_ISSUED,'MM/DD/YYYY'),'') DATEISSUED,
+NVL(TO_CHAR(DATE_CERT_TO_SO,'MM/DD/YYYY'),'') DATESENTTOSO,
+NVL(TO_CHAR(NVL(DATE_NEW_CERT_EXPIRES,DATE_CERT_EXPIRES),'MM/DD/YYYY'),'') DATEEXPIRES,
+--CONVERT(VARCHAR(10),NVL(D.DATE_ANN_CLOSED, ' ') ,1) DATECLOSE,
+' ' DATECLOSE,
+NVL (C.POSITION_TITLE, ' '),
+NVL (C.PAY_PLAN, ' ') ,
+NVL (C.SERIES, ' ') ,
+NVL (C.GRADE, ' '),
+NVL (O.ADMIN_CODE, ' '), 
+NVL (O.ORG_INITS,' '), 
+NVL (O.IC, ' ') 
+
+FROM 
+MAIN A 
+INNER JOIN NEW_POSITION C /*(NOLOCK)*/ ON C.TRANSACTION_ID = A.TRANSACTION_ID /*AND (C.TYPE) = 'Cert'*/ 
+INNER JOIN CERTIFICATE X ON A.TRANSACTION_ID = X.TRANSACTION_ID /*AND X.SEQUENCE = C.RELATED_ID*/
+INNER JOIN RECRUITMENT B ON B.TRANSACTION_ID = A.TRANSACTION_ID
+--INNER JOIN ANNOUNCEMENT D ON A.Transaction_id = D.Transaction_id AND D.ANN_NUMBER = X.ANN_NUMBER 
+INNER JOIN IC_REQUEST_INFO I ON I.TRANSACTION_ID = A.TRANSACTION_ID 
+INNER JOIN BIZFLOW.MEMBER H ON H.MEMBERID = HR_SPECIALIST_ID
+INNER JOIN ORGS O /*(NOLOCK)*/ ON O.ADMIN_CODE = A.ADMIN_CODE
+
+WHERE
+A.ACTION_TYPE = 'Recruitment' 
+
+
+AND A.STATUS NOT IN ('COMPLETED', 'CANCELLED')
+--AND X.CERT_ISSUED IN ('Yes', 'Y')
+AND NVL(TRUNC(((TO_DATE(DATE_NEW_CERT_EXPIRES,'DD-MON-YY') - SYSDATE) + 1)),0) IN (5)
+--AND A.INSTITUTE <> 'TEST'
+----AND E.CERT_TYPE <> 'Applicant List' 
+;
+----------QUERY END----------------
+
+BEGIN
+    OPEN CUR_RECIPIENTS;  
+    FETCH CUR_RECIPIENTS INTO
+        V_WITSNUMBER,
+        V_HRSNAME,
+        V_HRSEMAIL,
+        V_SOEMAIL,
+        V_AOEMAIL,
+        V_COUNT,
+        V_CERTNUM,
+        V_ANNTYPE,
+        V_ANNNUM ,
+        V_DATEISSUED,
+        V_DATECERTSENT,
+        V_DATEEXPIRES,
+        V_DATECLOSE,
+        V_POSTITLE,
+        V_PAYPLAN,
+        V_SERIES,
+        V_GRADE ,
+        V_ADMINCODE ,
+        V_ORGINITS ,
+        V_IC;
+  LOOP
+  
+  IF V_COUNT = 5 THEN
+
+    V_TORECIPIENTS := V_HRSEMAIL;
+    V_CCRECIPIENTS := V_HRSEMAIL;
+
+
+    V_SUBJECT := 'NOTICE - CERTIFICATE EXPIRATION - Request #' || V_WITSNUMBER /*V_POSTITLE || ' ' || V_PAYPLAN || '-' || V_SERIES || '-' || V_GRADE*/;
+    V_CONTENTTOP := 
+
+'<html>
+	<head>
+		<title>WiTS - Notice – Certificate Expiration  Email</title>
+	</head>
+	<body>
+		<p>
+			<font face=" Calibri" size="3"> <strong>Suggested Action: </strong></p>
+		<ul>
+			<li>
+				<span face="">If you are extending this certificate, review the new expiration date of the action in BizFlow form.&nbsp; </span></li>
+			<!--<li>
+				<span face="">If you are not extending this certificate, and you have not already done so, please complete the audit process in HHS Careers (USA Staffing) and send the Disposition Letters to your applicant pool.&nbsp; </span></li>-->
+			<li>
+				<span face="">If you need assistance auditing a certificate in USA Staffing, please reference the</span> <a href="http://intrahr.od.nih.gov/hrsystems/staffing/hhscareers/documents/HHS_Careers_Applicant_Referral_and_Selection_User_Guide.docx"><span face="">Applicant Referral and Selection User Guide</span></a><span face="">.&nbsp; </span></li>
+			<!--<li>
+				<span face="">For DE Announcements, be sure to send all required documents to the CSD DEU so that they can close out the case file.&nbsp; Remember that even if there is no selection, you must send final Disposition Letters to the applicants notifying them the status of their application.&nbsp; </span></li>-->
+		</ul> 
+
+<font face=" Calibri" size="3"><strong>Details:</strong> Your certificate ' || V_CERTNUM || '  will expire on ' || V_DATEEXPIRES || '. Please reference the table below for specific information related to this action.<br><br>
+
+	<table border="1" bordercolor="#BDBDBD" style="background-color:#FFFFFF" cellpadding="2" cellspacing="2"><font face=" Calibri" size="2">									' ||
+		'<tr>    												' ||
+		'<td style="width: 170px">        						' ||
+		'<font face=" Calibri" size="2"><strong>Request #</strong></td>						' ||
+		'<td style="width: 200px;"><font face=" Calibri" size="2">' || V_WITSNUMBER || '</td>			' ||
+		'</tr>													' ||
+		'<tr>    												' ||
+		'<td style="width: 170px">        						' ||
+		'<font face=" Calibri" size="2"><strong>Certificate #</strong></td>					' ||
+		'<td style="width: 200px;"><font face=" Calibri" size="2">' || V_CERTNUM || '</td>			' ||
+		'</tr>													' ||
+		'<tr>    												' ||
+		'<td style="width: 170px">        						' ||
+		'<font face=" Calibri" size="2"><strong>Certificate Issue Date </strong></td>					' ||
+		'<td style="width: 200px;"><font face=" Calibri" size="2">' || V_DATEISSUED || '</td>	        ' ||
+		'</tr>													' ||
+		'<tr>    												' ||
+		'<td style="width: 170px">    							' ||
+		'<font face=" Calibri" size="2"><strong>Certificate Expiration Date</strong></td>							' ||
+		'<td style="width: 200px"><font face=" Calibri" size="2">' || V_DATEEXPIRES || '</td>			' ||
+		'</tr>													' ||
+		'<tr>													' ||
+		'<td style="width: 170px">    							' ||
+		'<font face=" Calibri" size="2"><strong> Organization</strong></td>							' ||	
+		'<td style="width: 200px"><font face=" Calibri" size="2">' || V_ORGINITS || '</td>			' ||
+		'</tr>													' ||
+		'<!--<tr>													' ||
+		'<td style="width: 170px">    							' ||
+		'<font face=" Calibri" size="2"><strong> Position Title</strong></td>							' ||	
+		'<td style="width: 200px"><font face=" Calibri" size="2">' || V_POSTITLE  || '</td>			' ||
+		'</tr>													' ||
+		'<tr>													' ||
+		'<td style="width: 170px">    							' ||
+		'<font face=" Calibri" size="2"><strong> Pay Plan/Series/Grade</strong></td>							' ||
+		'<td style="width: 200px"><font face=" Calibri" size="2">' || V_PAYPLAN || '/' || V_SERIES || '/' || V_GRADE || '</td>			' ||
+		'</tr>		-->											' ||
+		'</table>												' ||
+		'<br>													
+
+		</table></body>
+</html>';
+
+
+    V_CONTENTBOTTOM := '<!--<font face=" Calibri" size="3"><br> Please refer to the <a href="http://intrahr.od.nih.gov/hrsystems/staffing/wits/documents/CSD_Reminder_Emails.pdf">CSD Reminder Email Guide</a> for more details about reminder emails.-->'		;
+
+    V_DAYS := ' '; 
+
+
+ 
+	V_SENDER := 'donotreply@hhs.gov';   
+	V_BCRECIPIENTS := 'witsinten@od.nih.gov';
+	V_BODY := V_CONTENTTOP ||  V_CONTENTBOTTOM;
+
+	--SP_SEND_MAIL('dkwak@bizflow.com','dkwak@deloitte.com','','bizflow@bizflow.com',V_SUBJECT,'',V_BODY);
+
+
+	-------EMAILSEND---------------
+	SP_SEND_MAIL(V_TORECIPIENTS,V_CCRECIPIENTS,V_BCRECIPIENTS,V_SENDER,V_SUBJECT,'',V_BODY);
+
+	INSERT INTO AUTO_EMAIL_LOG
+	(EMAIL_SENT_DATE, FROM_EMAIL_ADDRESS,TO_EMAIL_ADDRESS,SUBJECT,BODY,OFFICE, SLA, TRANSACTION_ID, CERT_NUMBER)     
+	VALUES
+	(SYSDATE, V_SENDER, V_TORECIPIENTS || ';' || V_CCRECIPIENTS, V_SUBJECT, 'From: ' || V_SENDER || '<br>To: ' || V_TORECIPIENTS || '<br>CC: ' || V_CCRECIPIENTS || '<br><br>Subject: ' ||  V_SUBJECT || '<br><br>' || V_BODY,'Rec13','SLA - Cert Expires HRS' || V_DAYS || '', V_WITSNUMBER, V_CERTNUM);
+	END IF;
+  
+  FETCH CUR_RECIPIENTS INTO 
+
+        V_WITSNUMBER,
+        V_HRSNAME,
+        V_HRSEMAIL,
+        V_SOEMAIL,
+        V_AOEMAIL,
+        V_COUNT,
+        V_CERTNUM,
+        V_ANNTYPE,
+        V_ANNNUM ,
+        V_DATEISSUED,
+        V_DATECERTSENT,
+        V_DATEEXPIRES,
+        V_DATECLOSE,
+        V_POSTITLE,
+        V_PAYPLAN,
+        V_SERIES,
+        V_GRADE ,
+        V_ADMINCODE ,
+        V_ORGINITS ,
+        V_IC ;
+
+
+    EXIT WHEN CUR_RECIPIENTS%NOTFOUND;
+
+    END LOOP;
+    CLOSE CUR_RECIPIENTS;
+    
+  NULL;
+END SP_JOB_RECRUITMENT_SLA_CERT_EX;
+
+/
+
+
+--------------------------------------------------------
+--  DDL for Procedure SP_JOB_RECRUITMENT_JOB_TENT
+--------------------------------------------------------
+
+CREATE OR REPLACE PROCEDURE SP_JOB_RECRUITMENT_JOB_TENT AS 
+V_SENDER VARCHAR2(100);
+V_TORECIPIENTS VARCHAR2 (500);
+V_CCRECIPIENTS VARCHAR2 (500);
+V_BCRECIPIENTS VARCHAR2 (500);
+V_SUBJECT VARCHAR2 (500);
+V_CONTENTTOP VARCHAR2(4000);
+V_CONTENTBOTTOM VARCHAR2(4000);
+V_TABLE VARCHAR2(4000);
+V_BODY CLOB;
+V_WITSNUMBER VARCHAR2 (10);
+V_HRSEMAIL VARCHAR2 (100);
+V_TEAMLEADEMAIL VARCHAR2 (100);
+V_BRANCHCHIEFEMAIL VARCHAR2 (100);
+V_ADMINOFFICERNAME VARCHAR2 (100);
+V_IC VARCHAR2 (10);
+V_ORGINITS VARCHAR2 (50);
+V_ADMINCODE VARCHAR2 (50);
+V_COUNT INT;
+V_ANNNUM VARCHAR2 (100);
+V_ANNTYPE VARCHAR2 (10);
+V_CERTNUM VARCHAR2 (100);
+V_CERTTYPE VARCHAR2 (20);
+V_DAYS VARCHAR2 (50);
+V_TARGETDATE VARCHAR2 (50);
+V_POSTITLE VARCHAR2 (100);
+V_PAYPLAN VARCHAR2 (100);
+V_SERIES VARCHAR2 (100);
+V_GRADE VARCHAR2 (100);
+
+CURSOR CUR_RECIPIENTS IS	 
+---------QUERY----------------
+SELECT 
+	A.TRANSACTION_ID,
+	(SELECT NVL(EMAIL, '') FROM BIZFLOW.MEMBER WHERE MEMBERID = HR_SPECIALIST_ID),
+	(SELECT NVL(EMAIL, '') FROM BIZFLOW.MEMBER WHERE MEMBERID = TEAM_LEADER_ID),
+	(SELECT NVL(EMAIL, '') FROM BIZFLOW.MEMBER WHERE MEMBERID = BRANCH_CHIEF_ID),
+	NVL(A.INSTITUTE, ''),
+	NVL(A.ORG_INITS, ''),
+	NVL(A.ADMIN_CODE, ''),
+	FN_GET_RECRUITMENT_EMAIL_TB_AP(A.TRANSACTION_ID, 'Approved',''),
+	NVL(TRUNC((SYSDATE - TO_DATE(E.DATE_HIRING_DEC_RECD_IN_HR,'DD-MON-YY'))),0) INTCOUNT,
+	NVL(E.ANN_NUMBER,'') ANN_NUMBER,
+	NVL(E.CERT_NUMBER, '') CERT_NUMBER,
+	NVL(E.CERT_TYPE, '') CERT_TYPE, 
+	--NVL(CONVERT(VARCHAR(10),E.DATE_HIRING_DEC_RECD_IN_HR + 2,1), '') TARGETDATE,
+	TO_CHAR(TO_DATE(E.DATE_HIRING_DEC_RECD_IN_HR,'DD-MON-YY')+2) TARGETDATE,
+	NVL(C.POSITION_TITLE, 'N/A') POSITION_TITLE,
+	NVL(C.PAY_PLAN, 'N/A') PAYPLAN, 
+	NVL(C.SERIES, 'N/A') SERIES, 
+	NVL(C.GRADE, 'N/A') GRADE 
+
+FROM MAIN A
+	INNER JOIN NEW_POSITION C /*(NOLOCK)*/ ON C.TRANSACTION_ID = A.TRANSACTION_ID /*AND (C.TYPE) = 'Approved'*/ 
+	INNER JOIN CERTIFICATE E ON A.TRANSACTION_ID = E.TRANSACTION_ID 
+	INNER JOIN APPOINTMENT F ON A.TRANSACTION_ID = F.TRANSACTION_ID
+WHERE
+	A.STATUS NOT IN ('COMPLETED', 'CANCELLED')
+AND
+	E.DATE_HIRING_DEC_RECD_IN_HR IS NOT NULL
+--AND DATEDIFF(DAY,E.DATE_HIRING_DEC_RECD_IN_HR,GETDATE())IN (2)
+AND NVL(TRUNC((SYSDATE - TO_DATE(E.DATE_HIRING_DEC_RECD_IN_HR,'DD-MON-YY'))),0) IN (2)
+--AND A.RELATED_WITS_TRANS_ID > 0
+AND TENTATIVE_JOB_OFFER_DATE IS NULL
+--AND A.INSTITUTE <> 'TEST'
+;
+----------QUERY END----------------
+BEGIN
+    OPEN CUR_RECIPIENTS;  
+    FETCH CUR_RECIPIENTS INTO
+        V_WITSNUMBER,
+        V_HRSEMAIL,
+        V_TEAMLEADEMAIL,
+        V_BRANCHCHIEFEMAIL,
+        V_IC,
+        V_ORGINITS,
+        V_ADMINCODE,
+        V_TABLE,
+        V_COUNT,
+        V_ANNNUM,
+        V_CERTNUM,
+        V_CERTTYPE,
+        V_TARGETDATE,
+        V_POSTITLE ,
+        V_PAYPLAN ,
+        V_SERIES ,
+        V_GRADE;
+
+    LOOP
+    
+        V_TORECIPIENTS := V_HRSEMAIL;
+        V_CCRECIPIENTS := V_TEAMLEADEMAIL || '; ' || V_BRANCHCHIEFEMAIL; 
+        
+        V_SUBJECT := 'Action Needed - Extend Tentative Job Offer - Request #' || V_WITSNUMBER/*V_POSTITLE|| ' '||V_PAYPLAN||'-'||V_SERIES||'-'||V_GRADE*/;
+        
+        V_CONTENTTOP := 
+                                                '<html>
+                                                    <head>
+                                                        <title>WiTS Make Tentative Job Offer</title>
+                                                    </head>
+                                                    <body>
+                                                        <font face=" Calibri" size="3"><strong>Suggested Action:</strong> Please extend the tentative job offer<!-- and complete the “Tentative Job Offer Date” field in the WiTS Appointment Form.--><br><br>'||
+        
+                                                        '<font face=" Calibri" size="3"><strong>Details:</strong> Action is needed on Request # '||V_WITSNUMBER||' in order to meet OPM Hiring Reform Goals. A tentative job offer needs to be made (a voice mail message is acceptable) to the selected candidate by close of business today. Please reference the table below for specific information related to this action.<br><br>
+                                                        
+                                                            </body>
+                                                                </html>';
+        
+        
+                                        V_CONTENTBOTTOM := '<br><font face=" Calibri" size="3"><p align="left">Do not respond to this email address.<!--Please refer to the <a href="http://intrahr.od.nih.gov/hrsystems/staffing/wits/documents/CSD_Reminder_Emails.pdf">CSD Reminder Email Guide</a> for more details about reminder emails.--></p>'		;
+        
+        
+        V_BODY := V_CONTENTTOP || V_TABLE || V_CONTENTBOTTOM;
+        
+        V_DAYS := ' (2-day notice) ';
+        
+        V_SUBJECT := V_SUBJECT;
+        
+        V_SENDER := 'donotreply@hhs.gov';
+        
+        V_BCRECIPIENTS := 'witsinten@od.nih.gov';
+        
+        --SP_SEND_MAIL('dkwak@bizflow.com','dkwak@deloitte.com','','bizflow@bizflow.com',V_SUBJECT,'',V_BODY);
+
+
+        -------EMAILSEND---------------
+        SP_SEND_MAIL(V_TORECIPIENTS,V_CCRECIPIENTS,V_BCRECIPIENTS,V_SENDER,V_SUBJECT,'',V_BODY);
+
+
+    INSERT INTO AUTO_EMAIL_LOG
+    (EMAIL_SENT_DATE, FROM_EMAIL_ADDRESS,TO_EMAIL_ADDRESS,SUBJECT,BODY,OFFICE, SLA, TRANSACTION_ID)     
+    VALUES
+    (SYSDATE, V_SENDER, V_TORECIPIENTS || ';' || V_CCRECIPIENTS, V_SUBJECT, 'From: ' || V_SENDER || '<br>To: ' || V_TORECIPIENTS || '<br>CC: ' || V_CCRECIPIENTS || '<br><br>Subject: ' ||  V_SUBJECT || '<br><br>' || V_BODY,'Rec3','SLA - Make Job Offer - Tentative ' || V_DAYS || '', V_WITSNUMBER);
+        
+    FETCH CUR_RECIPIENTS INTO 
+        V_WITSNUMBER,
+        V_HRSEMAIL,
+        V_TEAMLEADEMAIL,
+        V_BRANCHCHIEFEMAIL,
+        V_IC,
+        V_ORGINITS,
+        V_ADMINCODE,
+        V_TABLE,
+        V_COUNT,
+        V_ANNNUM,
+        V_CERTNUM,
+        V_CERTTYPE,
+        V_TARGETDATE,
+        V_POSTITLE ,
+        V_PAYPLAN ,
+        V_SERIES ,
+        V_GRADE;
+    
+    EXIT WHEN CUR_RECIPIENTS%NOTFOUND;
+
+    END LOOP;
+    CLOSE CUR_RECIPIENTS;
+  NULL;
+END SP_JOB_RECRUITMENT_JOB_TENT;
+
 /
