@@ -1,5 +1,18 @@
-[Sprint 1,2 and 3 and prod deployment]
-After deployment,  Open HHS WHRSC BizFlow HR System Deployment 06062018.docx and find 6. Event Response Adapotr (ERA).
-Update ERA configuration Step 3 and Step 8 .
+[July DEV and QA deployment]
+4.Methods of deployment file delivery
+5.Deployment Steps
+	5.1   Database Deployment
+	5.2   BIX deployment
+	5.4   UI Module Packaging
+	5.5   Web Application (UI Module) Deployment
+[July PROD deployment]
+4.Methods of deployment file delivery
+5.Deployment Steps
+	5.1   Database Deployment
+	5.2   BIX deployment
+	5.4   UI Module Packaging
+	5.5   Web Application (UI Module) Deployment
+6.Event Response Adaptor (ERA)
+
 
 
