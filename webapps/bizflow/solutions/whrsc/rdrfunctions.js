@@ -41,6 +41,7 @@ function approveDocument(param) {
 }
 function delDocument(param)
 {
+	debugger;
 	var items = getBizCoveComponent(param.bizcoveid).getSelectedItems();
 	if(items)
 	{
@@ -52,27 +53,37 @@ function delDocument(param)
 				var procid = data.procid;
 				var bizcoveid = param.bizcoveid;
 
-				//var url = "/bizflow/solutions/whrsc/deleterdr.jsp?processid="+data.procid+"&bizcoveid="+param.bizcoveid+"&_t="+(new Date()).getTime();            
-				//$("body").append("<iframe src='" + url + "' style='display:none;'></iframe");
-			$.ajax({
-				url: '/bizflow/solutions/whrsc/deleterdr.jsp',
-				method: 'POST',
-				data: {serverid: '0000001001', processid: procid, bizcoveid:bizcoveid},
-				dataType: 'json',
-				cache: false,
-				async: false,
-				success: function (resultObj){
-						if(resultObj.success)
-						{
-							location.reload();
-						}
-						else
-						{
-							alert(resultObj.message, "error");
-							//ret = false;
-						}
-				}
-			});
+				
+				$.ajax({
+					url: '/bizflow/solutions/whrsc/deleterdr.jsp',
+					method: 'POST',
+					data: {serverid: '0000001001', processid: procid, bizcoveid:bizcoveid},
+					dataType: 'json',
+					cache: false,
+					async: false,
+					success: function (resultObj){
+							if(resultObj.success)
+							{
+								
+								$.ajax({
+									url: '/bizflowwebmaker/whrsc_AUT/deleteRDR.do?procId=' + procid,
+									dataType: 'xml',
+									cache: false,
+									async: false,
+									success: function (xmlResponse) {
+										
+									}	
+								});							
+								location.reload();
+							}
+							else
+							{
+								alert(resultObj.message, "error");
+								//ret = false;
+							}
+					}
+				});
+				
 
 			}
 		}
