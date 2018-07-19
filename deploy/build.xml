@@ -28,8 +28,10 @@
 		<include name="rdr_uploadassignment/**" />
 		<include name="whrsc_appointment/**" />
 		<include name="whrsc_AUT/**" />
+		<include name="whrsc_branchAUT/**" />
 		<include name="whrsc_common/**" />
 		<include name="whrsc_recruitment/**" />
+		<include name="whrsc_recruitmentstatus/**" />
 
 
 		<exclude name="**/morphyc.xml" />
@@ -44,8 +46,10 @@
 		<include name="rdr_uploadassignment/doc/morphyc.xml" />
 		<include name="whrsc_appointment/doc/morphyc.xml" />
 		<include name="whrsc_AUT/doc/morphyc.xml" />
+		<include name="whrsc_branchAUT/doc/morphyc.xml" />
 		<include name="whrsc_common/doc/morphyc.xml" />
 		<include name="whrsc_recruitment/doc/morphyc.xml" />
+		<include name="whrsc_recruitmentstatus/doc/morphyc.xml" />
 	</patternset>
 
 	<!-- patters for web application files for blastcache -->
@@ -87,7 +91,7 @@
 		<antcall target="package.form.conf" />
 		<antcall target="package.form.addon" />
 		<antcall target="package.bizflow.custom" />
-		<antcall target="package.bizflow.custom.blastcache" />
+		<!--<antcall target="package.bizflow.custom.blastcache" />-->
 		<antcall target="zip.package" />
 	</target>
 
