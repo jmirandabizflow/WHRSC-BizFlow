@@ -15,6 +15,8 @@ DROP TABLE CHR_PCA_INFO;
 DROP TABLE CHR_PERFORMANCE_INFO;
 DROP TABLE CHR_PROBATION;
 DROP TABLE CHR_WGI;
+DROP TABLE CHR_PROCESSED_JOBS;
+DROP TABLE CHR_EMPLOYEE;
 DROP TABLE CNTRY_SUBD_CODES_LOOKUP;
 DROP TABLE COUNTRY_CODES_LOOKUP;
 DROP TABLE FORMS_FIELDS;
@@ -396,6 +398,14 @@ CREATE TABLE CHR_EMPLOYEE_INFO
 ALTER TABLE CHR_EMPLOYEE_INFO 
 ADD (PROCESSED VARCHAR2(20) );
 
+ALTER TABLE CHR_EMPLOYEE_INFO
+ADD
+(
+  DATE_JOB_REQ_APPROVED DATE,
+  CAPHR_COMMENTS  VARCHAR2(4000),
+  CAN_NUMBER  VARCHAR2(30)
+);
+
 --------------------------------------------------------
 --  DDL for Table CHR_PCA_INFO
 --------------------------------------------------------	
@@ -482,6 +492,26 @@ CREATE TABLE CHR_WGI
 	 IS_DISABLED		NCHAR(255),
 	 PARENT_CODE		NCHAR(255)
 	);
+
+--------------------------------------------------------
+--  DDL for Table CHR_PROCESSED_JOBS
+--------------------------------------------------------	
+CREATE TABLE HHS_WHRSC_HR.CHR_PROCESSED_JOBS
+(
+JOB_ID NUMBER(15,0) NOT NULL,
+EFFDT DATE,
+DATE_PROCESSED_IN_CAPHR DATE NOT NULL
+);
+
+--------------------------------------------------------
+--  DDL for Table CHR_EMPLOYEE
+--------------------------------------------------------	
+CREATE TABLE HHS_WHRSC_HR.CHR_EMPLOYEE
+(
+EMPID VARCHAR2(11) NOT NULL,
+FIRST_NAME VARCHAR2(30),
+LAST_NAME VARCHAR2(30)
+);
 
 --------------------------------------------------------
 --  DDL for Table COUNTRY_CODES_LOOKUP

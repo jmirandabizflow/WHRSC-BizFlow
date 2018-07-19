@@ -1,11 +1,18 @@
-After deployment, open BPS and add value for the folloing Global variable.
-	Gloval Variable Name: deQualityReviewerEmail
-	value: Clifton.green@hhs.gov
-	
-	Gloval Variable Name: dehrSpecialistEmail
-	value: Clifton.green@hhs.gov
-	
-	Gloval Variable Name: usasPath
-	value: /usasrwsc/usas/reportXML
+[July DEV and QA deployment]
+4.Methods of deployment file delivery
+5.Deployment Steps
+	5.1   Database Deployment
+	5.2   BIX deployment
+	5.4   UI Module Packaging
+	5.5   Web Application (UI Module) Deployment
+[July PROD deployment]
+4.Methods of deployment file delivery
+5.Deployment Steps
+	5.1   Database Deployment
+	5.2   BIX deployment
+	5.4   UI Module Packaging
+	5.5   Web Application (UI Module) Deployment
+6.Event Response Adaptor (ERA)
+
 
 
