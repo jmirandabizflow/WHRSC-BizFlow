@@ -11,11 +11,20 @@
 	<name>caphr</name>
 	<description>Import CapHR data into WHRSC database tables</description>
 
+
+	<repositories>
+		<repository>
+			<id>project.repo.local</id>
+			<name>In-project repository to configure dependent jars for build</name>
+			<url>file://${project.basedir}/repo</url>
+		</repository>
+	</repositories>
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.10.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+ 		<version>1.5.10.RELEASE</version> 		
+		<relativePath/> 
 	</parent>
 
 	<properties>
@@ -27,78 +36,75 @@
 	</properties>
 
 	<dependencies>
+		<!-- dependencies for spring boot -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-loader</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-batch</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.batch</groupId>
-			<artifactId>spring-batch-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+		
 		<!-- dependencies from local repository -->
-		<dependency>
-			<groupId>proj.lib.local</groupId>
-			<artifactId>axis</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>proj.lib.local</groupId>
-			<artifactId>commons-discovery</artifactId>
-			<version>0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>proj.lib.local</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>proj.lib.local</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.8</version>
-		</dependency>
-		<dependency>
-			<groupId>proj.lib.local</groupId>
-			<artifactId>jaxrpc</artifactId>
-			<version>1.1</version>
-		</dependency>
 		<dependency>
 			<groupId>proj.lib.local</groupId>
 			<artifactId>ojdbc7</artifactId>
 			<version>12.1.0</version>
 		</dependency>
-		<dependency>
-			<groupId>proj.lib.local</groupId>
-			<artifactId>saaj</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>proj.lib.local</groupId>
-			<artifactId>wsdl4j</artifactId>
-			<version>1.5.1</version>
-		</dependency>
+
 	</dependencies>
+
+
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<executable>true</executable>
+				</configuration>
 			</plugin>
+
+			<!-- 
+			Run install-file goal to include 3rd party jars to local project repository for build.
+			This should be executed by calling clean goal.  It is to avoid error by dependency 
+			checking done before running goals in plugin in normal validate cycle.
+
+				mvn clean
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.5.2</version>
+				<executions>
+					<execution>
+						<id>install-ojdbc-jar-lib</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>clean</phase>
+						<configuration>
+							<file>${project.basedir}/lib/ojdbc7-12.1.0.jar</file>
+							<groupId>proj.lib.local</groupId>
+							<artifactId>ojdbc7</artifactId>
+							<version>12.1.0</version>
+							<packaging>jar</packaging>
+							<localRepositoryPath>${project.basedir}/repo</localRepositoryPath>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
