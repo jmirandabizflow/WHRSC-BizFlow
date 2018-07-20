@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE BODY HHS_WHRSC_HR.CAPHR_DATA_PKS AS
+create or replace PACKAGE BODY              CAPHR_DATA_PKS AS
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 --THIS PACKAGE WILL HANDLE PULLING AND POPULATING CapHR TABLES in HHS_WHRSC_HR SCHEMA (CHR_ TABLES)
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +32,8 @@ CURSOR CUR_ADMIN_CODE
     STAFFDIV,
     STAFFDIV_NAME
     FROM HHS_HR.ADMINISTRATIVE_CODE
-    WHERE OPDIV IN ('ACF','ACL','AHRQ','ASA','ASFR','ASL','ASPA','ASPE','ASPR','DAB','IEA','IOS','OASH','OCIO','OCR','OGA','OGC','ONC','OSSI','PSC','SAMHSA');
+    WHERE OPDIV IN ('ACF','ACL','AHRQ','ASA','ASFR','ASL','ASPA','ASPE','ASPR','DAB','IEA','IOS','OASH','OCIO','OCR','OGA','OGC','ONC','OSSI','PSC','SAMHSA')
+    AND ADMIN_CODE NOT LIKE 'H%'; 
     
     TYPE TYP_ADMIN_CODE IS TABLE OF CUR_ADMIN_CODE%ROWTYPE
     INDEX BY PLS_INTEGER;
@@ -197,7 +198,7 @@ BEGIN
         WHEN ADMIN_CODE LIKE 'M%' THEN 'SAMHSA'
         WHEN ADMIN_CODE LIKE 'P%' THEN 'PSC'
         ELSE ' ' END;
-        
+        COMMIT;
       END IF;
 
 END INSERT_ADMIN_CODES;
@@ -236,6 +237,7 @@ BEGIN
                           SP_ERROR_LOG();
               END;
           END LOOP;
+          COMMIT;
     END IF;
     
 END INSERT_CAPHR_EMP_DATA;
@@ -274,6 +276,7 @@ BEGIN
                           SP_ERROR_LOG();
               END;
           END LOOP;
+          COMMIT;
     END IF;
     
 END INSERT_CAPHR_JOBID;
@@ -312,6 +315,7 @@ BEGIN
                           SP_ERROR_LOG();
               END;
           END LOOP;
+          COMMIT;
     END IF;
     
 END INSERT_CAPHR_PCA_INFO;
@@ -429,4 +433,3 @@ BEGIN
 END ERROR_LOG;
 
 END CAPHR_DATA_PKS;
-/
