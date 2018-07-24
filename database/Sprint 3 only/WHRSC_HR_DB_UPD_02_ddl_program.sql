@@ -3362,3 +3362,188 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
 			--DBMS_OUTPUT.PUT_LINE('Error message = ' || V_ERRMSG);
 	END;
 /
+
+--------------------------------------------------------
+--  DDL for Procedure SP_UPDATE_FORM_DATA
+--------------------------------------------------------
+
+create or replace PROCEDURE SP_UPDATE_FORM_DATA
+(
+	--IO_ID               IN OUT  NUMBER
+	I_FORM_TYPE       IN      VARCHAR2
+	, I_FIELD_DATA      IN      CLOB
+	, I_USER            IN      VARCHAR2
+	, I_PROCID          IN      NUMBER
+  , I_TRANSACTIONID   IN      NUMBER
+	, I_ACTSEQ          IN      NUMBER
+	, I_WITEMSEQ        IN      NUMBER
+)
+IS
+	V_ID NUMBER(20);
+	V_FORM_TYPE VARCHAR2(50);
+	V_USER VARCHAR2(50);
+	V_PROCID NUMBER(10);
+  V_TRANSACTION NUMBER(10);
+	V_ACTSEQ NUMBER(10);
+	V_WITEMSEQ NUMBER(10);
+	V_REC_CNT NUMBER(10);
+	V_MAX_ID NUMBER(20);
+	V_XMLDOC XMLTYPE;
+  
+  
+BEGIN
+
+	--DBMS_OUTPUT.PUT_LINE('PARAMETERS ----------------');
+	--DBMS_OUTPUT.PUT_LINE('    ID IS NULL?  = ' || (CASE WHEN IO_ID IS NULL THEN 'YES' ELSE 'NO' END));
+	--DBMS_OUTPUT.PUT_LINE('    ID           = ' || TO_CHAR(IO_ID));
+	--DBMS_OUTPUT.PUT_LINE('    I_FORM_TYPE  = ' || I_FORM_TYPE);
+	--DBMS_OUTPUT.PUT_LINE('    I_FIELD_DATA = ' || I_FIELD_DATA);
+	--DBMS_OUTPUT.PUT_LINE('    I_USER       = ' || I_USER);
+	--DBMS_OUTPUT.PUT_LINE('    I_PROCID     = ' || TO_CHAR(I_PROCID));
+	--DBMS_OUTPUT.PUT_LINE('    I_ACTSEQ     = ' || TO_CHAR(I_ACTSEQ));
+	--DBMS_OUTPUT.PUT_LINE('    I_WITEMSEQ   = ' || TO_CHAR(I_WITEMSEQ));
+	--DBMS_OUTPUT.PUT_LINE(' ----------------');
+	V_XMLDOC := XMLTYPE(I_FIELD_DATA);
+ -- DBMS_OUTPUT.PUT_LINE('IO_ID = '  || IO_ID);
+
+	--IF IO_ID IS NOT NULL AND IO_ID > 0 THEN
+	--	V_ID := IO_ID;
+	--ELSE
+ 
+		--DBMS_OUTPUT.PUT_LINE('Attempt to find record using PROCID: ' || TO_CHAR(I_PROCID));
+		-- if existing record is found using procid, use that id
+ 		
+    IF I_TRANSACTIONID IS NOT NULL AND I_TRANSACTIONID > 0 THEN
+      V_TRANSACTION := I_TRANSACTIONID;
+			BEGIN
+				SELECT ID INTO V_ID FROM TBL_FORM_DTL WHERE TRANSACTIONID = I_TRANSACTIONID;
+ 			EXCEPTION
+				WHEN NO_DATA_FOUND THEN
+					V_ID := -1;
+			END;
+		END IF;
+    
+   /*IF I_PROCID IS NOT NULL AND I_PROCID > 0 THEN
+			BEGIN
+				SELECT ID INTO V_ID FROM TBL_FORM_DTL WHERE PROCID = I_PROCID;
+ 			EXCEPTION
+				WHEN NO_DATA_FOUND THEN
+					V_ID := -1;
+			END;
+		END IF;
+  */
+		--DBMS_OUTPUT.PUT_LINE('No record found for PROCID: ' || TO_CHAR(I_PROCID));
+
+--    IO_ID := V_ID;
+	--END IF;
+
+	--DBMS_OUTPUT.PUT_LINE('ID to be used is determined: ' || TO_CHAR(V_ID));
+
+	IF I_PROCID IS NOT NULL AND I_PROCID > 0 THEN
+		V_PROCID := I_PROCID;
+	ELSE
+		V_PROCID := 0;
+	END IF;
+
+	IF I_ACTSEQ IS NOT NULL AND I_ACTSEQ > 0 THEN
+		V_ACTSEQ := I_ACTSEQ;
+	ELSE
+		V_ACTSEQ := 0;
+	END IF;
+
+	IF I_WITEMSEQ IS NOT NULL AND I_WITEMSEQ > 0 THEN
+		V_WITEMSEQ := I_WITEMSEQ;
+	ELSE
+		V_WITEMSEQ := 0;
+	END IF;
+
+	BEGIN
+		SELECT COUNT(*) INTO V_REC_CNT FROM TBL_FORM_DTL WHERE ID = V_ID;
+	EXCEPTION
+		WHEN NO_DATA_FOUND THEN
+			V_REC_CNT := -1;
+	END;
+
+	V_FORM_TYPE := I_FORM_TYPE;
+	V_USER := I_USER;
+
+	--DBMS_OUTPUT.PUT_LINE('Inspected existence of same record.');
+	--DBMS_OUTPUT.PUT_LINE('    V_ID       = ' || TO_CHAR(V_ID));
+	--DBMS_OUTPUT.PUT_LINE('    V_PROCID   = ' || TO_CHAR(V_PROCID));
+	--DBMS_OUTPUT.PUT_LINE('    V_ACTSEQ   = ' || TO_CHAR(V_ACTSEQ));
+	--DBMS_OUTPUT.PUT_LINE('    V_WITEMSEQ = ' || TO_CHAR(V_WITEMSEQ));
+	--DBMS_OUTPUT.PUT_LINE('    V_REC_CNT  = ' || TO_CHAR(V_REC_CNT));
+
+	
+
+	IF V_REC_CNT > 0 THEN
+		--DBMS_OUTPUT.PUT_LINE('Record found so that field data will be updated on the same record.');
+
+		UPDATE TBL_FORM_DTL
+		SET
+			PROCID = V_PROCID
+      , TRANSACTIONID = I_TRANSACTIONID
+			, ACTSEQ = V_ACTSEQ
+			, WITEMSEQ = V_WITEMSEQ
+			, FIELD_DATA = V_XMLDOC
+			, MOD_DT = SYSDATE
+			, MOD_USR = V_USER
+		WHERE ID = V_ID
+		;
+
+	ELSE
+		--DBMS_OUTPUT.PUT_LINE('No record found so that new record will be inserted.');
+   
+    
+		INSERT INTO TBL_FORM_DTL
+		(
+--			ID
+--			, PROCID
+			PROCID
+      , TRANSACTIONID
+			, ACTSEQ
+			, WITEMSEQ
+			, FORM_TYPE
+			, FIELD_DATA
+			, CRT_DT
+			, CRT_USR
+		)
+		VALUES
+		(
+--			V_ID
+--			, V_PROCID
+			V_PROCID
+      , I_TRANSACTIONID
+			, V_ACTSEQ
+			, V_WITEMSEQ
+			, V_FORM_TYPE
+			, V_XMLDOC
+			, SYSDATE
+			, V_USER
+		)
+		;
+    
+	END IF;
+
+	-- Update process variable and transition xml into individual tables
+	-- for respective process definition
+	IF V_FORM_TYPE = 'WHRSCDETERMINE' THEN
+		SP_UPDATE_PV_DETERMINE(V_PROCID, V_XMLDOC);
+		SP_UPDATE_DETERMINE_TABLE(V_PROCID, V_XMLDOC);
+	ELSIF V_FORM_TYPE = 'WHRSCRECRUITMENT' THEN
+		SP_UPDATE_PV_RECRUITMENT(V_PROCID, V_XMLDOC);
+    SP_UPDATE_RECRUITMENT_PROCESS(V_TRANSACTION, V_XMLDOC);
+	ELSIF V_FORM_TYPE = 'WHRSCAPPOINTMENT' THEN
+    SP_UPDATE_PV_APPOINTMENT(V_PROCID, V_XMLDOC);
+    SP_UPDATE_APPOINTMENT_PROCESS(V_TRANSACTION, V_XMLDOC);
+  END IF;
+
+	COMMIT;
+
+EXCEPTION
+	WHEN OTHERS THEN
+		SP_ERROR_LOG();
+		--DBMS_OUTPUT.PUT_LINE('Error occurred while executing SP_UPDATE_FORM_DATA -------------------');
+
+END;
+/
