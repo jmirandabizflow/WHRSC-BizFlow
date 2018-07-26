@@ -1,4 +1,4 @@
-create or replace PACKAGE BODY              CAPHR_DATA_PKS AS
+create or replace PACKAGE BODY HHS_WHRSC_HR.CAPHR_DATA_PKS AS
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 --THIS PACKAGE WILL HANDLE PULLING AND POPULATING CapHR TABLES in HHS_WHRSC_HR SCHEMA (CHR_ TABLES)
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -110,7 +110,8 @@ SELECT  JO.HRS_JOB_OPENING_ID,
             AND TO_CHAR(JO.HRS_JOB_OPENING_ID) NOT IN (SELECT ID FROM HHS_WHRSC_HR.CHR_EMPLOYEE_INFO)
             AND JO.BUSINESS_UNIT IN ('OS000','ACF00','ACL00','AHRQ0','PSC00','SAMHS','AOA00')
             AND JO.AUTHORIZATION_DT > '01-JAN-2018'
-            
+            AND JO.DEPTID NOT LIKE 'AK%'
+            AND JO.DEPTID NOT LIKE 'M%'
     ORDER BY JO.HRS_JOB_OPENING_ID ASC;
     
     TYPE TYP_JOB_OPENINGS IS TABLE OF CUR_CAPHR_JOB_OPENINGS%ROWTYPE
@@ -460,3 +461,4 @@ BEGIN
 END ERROR_LOG;
 
 END CAPHR_DATA_PKS;
+/
