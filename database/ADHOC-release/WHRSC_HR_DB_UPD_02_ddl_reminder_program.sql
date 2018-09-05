@@ -753,11 +753,11 @@ CURSOR CUR_RECIPIENTS IS
 		A.TRANSACTION_ID,
 		--NVL(H.SHORTNAME,'') + ' '  + dbo.fn_GET_NAME_FROM_MEMBERTBL (h.name)HRSName, 
 		NVL(H.NAME,'') HRSNAME,
-		NVL((SELECT NVL(EMAIL, '') EMAIL  FROM BIZFLOW.MEMBER WHERE MEMBERID = HR_SPECIALIST_ID),'unassigned@mail.nih.gov') HRSEMAIL,
-		NVL((SELECT NVL(EMAIL, '') EMAIL  FROM BIZFLOW.MEMBER WHERE MEMBERID = TEAM_LEADER_ID),'unassignedTL@mail.nih.gov') TEAMLEADEREMAIL,
-		NVL((SELECT NVL(EMAIL, '') EMAIL  FROM BIZFLOW.MEMBER WHERE MEMBERID = BRANCH_CHIEF_ID),'unassignedBC@mail.nih.gov') BRANCHCHIEFEMAIL,
+		NVL((SELECT NVL(EMAIL, '') EMAIL  FROM BIZFLOW.MEMBER WHERE MEMBERID = HR_SPECIALIST_ID),'') HRSEMAIL,
+		NVL((SELECT NVL(EMAIL, '') EMAIL  FROM BIZFLOW.MEMBER WHERE MEMBERID = TEAM_LEADER_ID),'') TEAMLEADEREMAIL,
+		NVL((SELECT NVL(EMAIL, '') EMAIL  FROM BIZFLOW.MEMBER WHERE MEMBERID = BRANCH_CHIEF_ID),'') BRANCHCHIEFEMAIL,
 		NVL(D.IC_CONTACT_FIRST_NAME, '') || ' ' || NVL(IC_CONTACT_LAST_NAME, '[Unknown AO]') ADMINOFFICERNAME,
-		--NVL(D.IC_CONTACT_EMAIL, 'unassignedAO@mail.nih.gov') AdminOfficeremail,
+		--NVL(D.IC_CONTACT_EMAIL, '') AdminOfficeremail,
 		NVL((SELECT NVL(EMAIL, '') EMAIL  FROM BIZFLOW.MEMBER WHERE MEMBERID = 
 				(SELECT MAX(X.HR_SENIOR_ADVISOR_ID)
 				 FROM TBL_FORM_DTL FD  
@@ -766,8 +766,8 @@ CURSOR CUR_RECIPIENTS IS
 						COLUMNS
 							TRANSACTION_ID			NUMBER(10)  PATH 'MAIN/TRANSACTION_ID',
                             HR_SENIOR_ADVISOR_ID	VARCHAR2(10) PATH 'TRANSACTION/HR_SENIOR_ADVISOR_ID' ) X
-				 WHERE X.TRANSACTION_ID = A.TRANSACTION_ID)),'unassignedAO@mail.nih.gov') ADMINOFFICEREMAIL,
-		NVL(D.FTE_LIAISON_EMAIL, 'unassigned@mail.nih.gov') LIAISONEMAIL,
+				 WHERE X.TRANSACTION_ID = A.TRANSACTION_ID)),'') ADMINOFFICEREMAIL,
+		NVL(D.FTE_LIAISON_EMAIL, '') LIAISONEMAIL,
 		NVL(O.IC, '') IC,
 		NVL(O.ORG_INITS, '') ORGINITS,
 		NVL(O.ADMIN_CODE, '') ADMINCODE,
@@ -947,15 +947,16 @@ BEGIN
 			
 				V_DAYS := '90';
 				
-				V_TORECIPIENTS := 'martijo@od.nih.gov';
+				V_TORECIPIENTS := V_CSDDEMAIL;
+				--V_TORECIPIENTS := 'martijo@od.nih.gov';
 				V_CCRECIPIENTS := V_BRANCHCHIEFEMAIL  || ';' || V_TEAMLEADEMAIL || ';' || V_HRSEMAIL || ';' || V_CSDDEMAIL || ';' || V_ADMINOFFICEREMAIL;	
 		
-		ELSE
+		--ELSE
 				
-				V_DAYS := 'Unknown';
-				V_SUBJECT := 'Reminder: Active Recruitment Action (UNKNOWN) Recruitment #' || V_WITSNUMBER || ' - Action Needed';
-				V_TORECIPIENTS := 'witsinten@od.nih.gov';
-				V_CCRECIPIENTS := 'witsinten@od.nih.gov';
+		--		V_DAYS := 'Unknown';
+		--		V_SUBJECT := 'Reminder: Active Recruitment Action (UNKNOWN) Recruitment #' || V_WITSNUMBER || ' - Action Needed';
+		--		V_TORECIPIENTS := 'witsinten@od.nih.gov';
+		--		V_CCRECIPIENTS := 'witsinten@od.nih.gov';
 		END IF;
 
 		V_CONTENTTOP := 
@@ -978,12 +979,12 @@ BEGIN
 		|| '<strong>Date of Pre-Recruitment Form Signed:</strong> ' || V_PRERECRUITFORM || ' <br>'
 		|| '<strong> Comments: </strong><br>' || V_COMMENTS || '<br><br>'
 		|| V_REMINDERS || '<br><br>'
-		|| '<font face=" Calibri" size="3"><!--<p align="left">Please refer to the <a href="http://intrahr.od.nih.gov/hrsystems/staffing/wits/documents/CSD_Reminder_Emails.pdf">CSD Reminder Email Guide</a> for more details about reminder emails.</p>-->';
+		|| '<font face=" Calibri" size="3"><!--<p align="left">Please refer to the WHRSC Recruitment User Guide for more details about reminder emails.</p>-->';
 
 		V_SENDER := 'donotreply@hhs.gov' /*'WiTS/HRC@mail.nih.gov'*/;
 		V_BODY := V_CONTENTTOP || V_TABLE || V_CONTENTBOTTOM;
 		V_SUBJECT := 'Action Needed - Move Recruitment Action Forward - ' || V_POSTITLE || ' ' || V_PAYPLAN || '-' || V_SERIES || '-' || V_GRADE;
-		V_BCRECIPIENTS := 'witsinten@od.nih.gov';
+		--V_BCRECIPIENTS := 'witsinten@od.nih.gov';
 
 ------------------------------------
 -------EMAILSEND---------------
@@ -1192,13 +1193,13 @@ BEGIN
 	'<font face=" Calibri" size="3"><strong>Details:</strong> Action is needed on Request # '|| V_WITSNUMBER || ' in order to meet the OPM Hiring Reform Goals. The vacancy announcement(s) listed below should be released by close of business today. Please reference the table below for specific information related to this action.<br><br>';
 
 
---v_ContentBottom := '<br><font face=" Calibri" size="3"><p align="left">Please refer to the <a href="http://intrahr.od.nih.gov/hrsystems/staffing/wits/documents/CSD_Reminder_Emails.pdf">CSD Reminder Email Guide</a> for more details about reminder emails.</p>'		;
+--v_ContentBottom := '<br><font face=" Calibri" size="3"><p align="left">Please refer to the WHRSC Recruitment User Guide for more details about reminder emails.</p>'		;
 
 	V_CONTENTBOTTOM := '<br><font face=" Calibri" size="3"><p align="left">Do not respond to this email.</p>';
 	V_BODY := V_CONTENTTOP || V_TABLE || V_CONTENTBOTTOM;
 	V_DAYS := ' (2-day notice) ';
 
-	V_BCRECIPIENTS := 'witsinten@od.nih.gov';
+	--V_BCRECIPIENTS := 'witsinten@od.nih.gov';
 	V_SUBJECT := V_SUBJECT;
 	V_SENDER := 'donotreply@hhs.gov'/*'WiTS/HRC@mail.nih.gov'*/;
 
@@ -1362,7 +1363,7 @@ BEGIN
 
 '<html>
 	<head>
-		<title>WiTS - Notice â€“ Certificate Expiration  Email</title>
+		<title>WiTS - Notice – Certificate Expiration  Email</title>
 	</head>
 	<body>
 		<p>
@@ -1373,7 +1374,7 @@ BEGIN
 			<!--<li>
 				<span face="">If you are not extending this certificate, and you have not already done so, please complete the audit process in HHS Careers (USA Staffing) and send the Disposition Letters to your applicant pool.&nbsp; </span></li>-->
 			<li>
-				<span face="">If you need assistance auditing a certificate in USA Staffing, please reference the</span> <a href="http://intrahr.od.nih.gov/hrsystems/staffing/hhscareers/documents/HHS_Careers_Applicant_Referral_and_Selection_User_Guide.docx"><span face="">Applicant Referral and Selection User Guide</span></a><span face="">.&nbsp; </span></li>
+				<span face="">If you need assistance auditing a certificate in USA Staffing, please reference the/*</span> <a href="http://intrahr.od.nih.gov/hrsystems/staffing/hhscareers/documents/HHS_Careers_Applicant_Referral_and_Selection_User_Guide.docx"><span face="">*/Applicant Referral and Selection User Guide</span></a><span face="">.&nbsp; </span></li>
 			<!--<li>
 				<span face="">For DE Announcements, be sure to send all required documents to the CSD DEU so that they can close out the case file.&nbsp; Remember that even if there is no selection, you must send final Disposition Letters to the applicants notifying them the status of their application.&nbsp; </span></li>-->
 		</ul> 
@@ -1423,14 +1424,14 @@ BEGIN
 </html>';
 
 
-    V_CONTENTBOTTOM := '<!--<font face=" Calibri" size="3"><br> Please refer to the <a href="http://intrahr.od.nih.gov/hrsystems/staffing/wits/documents/CSD_Reminder_Emails.pdf">CSD Reminder Email Guide</a> for more details about reminder emails.-->'		;
+    V_CONTENTBOTTOM := '<!--<font face=" Calibri" size="3"><br> Please refer to the WHRSC Recruitment User Guide for more details about reminder emails.-->'		;
 
     V_DAYS := ' '; 
 
 
  
 	V_SENDER := 'donotreply@hhs.gov';   
-	V_BCRECIPIENTS := 'witsinten@od.nih.gov';
+	--V_BCRECIPIENTS := 'witsinten@od.nih.gov';
 	V_BODY := V_CONTENTTOP ||  V_CONTENTBOTTOM;
 
 	--SP_SEND_MAIL('dkwak@bizflow.com','dkwak@deloitte.com','','bizflow@bizflow.com',V_SUBJECT,'',V_BODY);
@@ -1588,7 +1589,7 @@ BEGIN
                                                         <title>WiTS Make Tentative Job Offer</title>
                                                     </head>
                                                     <body>
-                                                        <font face=" Calibri" size="3"><strong>Suggested Action:</strong> Please extend the tentative job offer<!-- and complete the â€œTentative Job Offer Dateâ€ field in the WiTS Appointment Form.--><br><br>'||
+                                                        <font face=" Calibri" size="3"><strong>Suggested Action:</strong> Please extend the tentative job offer<!-- and complete the “Tentative Job Offer Date” field in the WiTS Appointment Form.--><br><br>'||
         
                                                         '<font face=" Calibri" size="3"><strong>Details:</strong> Action is needed on Request # '||V_WITSNUMBER||' in order to meet OPM Hiring Reform Goals. A tentative job offer needs to be made (a voice mail message is acceptable) to the selected candidate by close of business today. Please reference the table below for specific information related to this action.<br><br>
                                                         
@@ -1596,7 +1597,7 @@ BEGIN
                                                                 </html>';
         
         
-                                        V_CONTENTBOTTOM := '<br><font face=" Calibri" size="3"><p align="left">Do not respond to this email address.<!--Please refer to the <a href="http://intrahr.od.nih.gov/hrsystems/staffing/wits/documents/CSD_Reminder_Emails.pdf">CSD Reminder Email Guide</a> for more details about reminder emails.--></p>'		;
+                                        V_CONTENTBOTTOM := '<br><font face=" Calibri" size="3"><p align="left">Do not respond to this email address.<!--Please refer to the WHRSC Recruitment User Guide for more details about reminder emails.--></p>'		;
         
         
         V_BODY := V_CONTENTTOP || V_TABLE || V_CONTENTBOTTOM;
@@ -1607,7 +1608,7 @@ BEGIN
         
         V_SENDER := 'donotreply@hhs.gov';
         
-        V_BCRECIPIENTS := 'witsinten@od.nih.gov';
+        --V_BCRECIPIENTS := 'witsinten@od.nih.gov';
         
         --SP_SEND_MAIL('dkwak@bizflow.com','dkwak@deloitte.com','','bizflow@bizflow.com',V_SUBJECT,'',V_BODY);
 
@@ -1827,7 +1828,7 @@ BEGIN
     
         V_TORECIPIENTS := V_SOEMAIL || ';' || V_AOEMAIL;
         V_CCRECIPIENTS := V_HRSEMAIL || ';' || V_SAEMAIL;
-        V_SUBJECT := 'Action Needed - Hiring Decision Needed Certs Expiring â€“ ' || V_POSTITLE || ' ' || V_PAYPLAN || '-' || V_SERIES || '-' || V_GRADE;
+        V_SUBJECT := 'Action Needed - Hiring Decision Needed Certs Expiring – ' || V_POSTITLE || ' ' || V_PAYPLAN || '-' || V_SERIES || '-' || V_GRADE;
         
         V_CONTENTTOP := 
         
@@ -1847,10 +1848,10 @@ BEGIN
     END IF;
     
     
-    V_CONTENTBOTTOM :=  '<br><font face=" Calibri" size="3"><p align="left">Do not respond to this email.<!--Please refer to the <a href="http://intrahr.od.nih.gov/hrsystems/staffing/wits/documents/CSD_Reminder_Emails.pdf">CSD Reminder Email Guide</a> for more details about reminder emails.--></p>'		;
+    V_CONTENTBOTTOM :=  '<br><font face=" Calibri" size="3"><p align="left">Do not respond to this email.<!--Please refer to the WHRSC Recruitment User Guide for more details about reminder emails.--></p>'		;
     V_DAYS := ' ';
     V_SENDER := 'donotreply@hhs.gov';
-    V_BCRECIPIENTS := 'witsinten@od.nih.gov';
+    --V_BCRECIPIENTS := 'witsinten@od.nih.gov';
     
     V_BODY := V_CONTENTTOP ||  V_TABLE || V_CONTENTBOTTOM;
     
