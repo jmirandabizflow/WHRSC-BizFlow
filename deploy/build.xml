@@ -32,6 +32,12 @@
 		<include name="whrsc_common/**" />
 		<include name="whrsc_recruitment/**" />
 		<include name="whrsc_recruitmentstatus/**" />
+		<include name="listmanager_AUT/**" />
+		<include name="listmanager_common/**" />
+		<include name="listmanager_managecandidate/**" />
+		<include name="listmanager_managelist/**" />
+		<include name="listmanager_searchlist/**" />
+		
 
 
 		<exclude name="**/morphyc.xml" />
@@ -50,6 +56,11 @@
 		<include name="whrsc_common/doc/morphyc.xml" />
 		<include name="whrsc_recruitment/doc/morphyc.xml" />
 		<include name="whrsc_recruitmentstatus/doc/morphyc.xml" />
+		<include name="listmanager_AUT/doc/morphyc.xml" />
+		<include name="listmanager_common/doc/morphyc.xml" />
+		<include name="listmanager_managecandidate/doc/morphyc.xml" />
+		<include name="listmanager_managelist/doc/morphyc.xml" />
+		<include name="listmanager_searchlist/doc/morphyc.xml" />
 	</patternset>
 
 	<!-- patters for web application files for blastcache -->
