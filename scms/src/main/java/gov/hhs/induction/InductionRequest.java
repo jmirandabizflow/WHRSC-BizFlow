@@ -5,7 +5,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.springframework.beans.factory.annotation.Value;
 
@@ -40,7 +39,8 @@ public class InductionRequest {
     private String foreignIDIssuingCountry;   
     @XmlElement(name = "DOB", required = true)
     @XmlSchemaType(name = "date")
-    private XMLGregorianCalendar DateOfBirth;
+    //private XMLGregorianCalendar DateOfBirth;
+    private String DateOfBirth;
     //@XmlElement(name = "EmergencyResponder")
     //@XmlSchemaType(name = "string")
     @Value("${request.emergencyResponder}")
@@ -86,7 +86,7 @@ public class InductionRequest {
 	
 	
 	public InductionRequest(boolean personSponsored, String firstName, String lastName, String ssn, String arn,
-			String visaNumber, String foreignIDNumber, String foreignIDIssuingCountry, XMLGregorianCalendar dateOfBirth,
+			String visaNumber, String foreignIDNumber, String foreignIDIssuingCountry, String dateOfBirth,
 			String emergencyResponder, String organization, String opdiv, String affiliationCode,
 			String credentialCategory) {
 		this.personSponsored = String.valueOf(personSponsored);
@@ -149,15 +149,21 @@ public class InductionRequest {
 		this.foreignIDNumber = foreignIDNumber;
 	}
 	public CountryCodeType getForeignIDIssuingCountry() {
-		return CountryCodeType.valueOf(foreignIDIssuingCountry);
+		return CountryCodeType.fromValue(foreignIDIssuingCountry);
 	}
-	public void setForeignIDIssuingCountry(CountryCodeType foreignIDIssuingCountry) {
-		this.foreignIDIssuingCountry = foreignIDIssuingCountry.name();
+	public String getForeignIDIssuingCountryAsString() {
+		return foreignIDIssuingCountry;
 	}
-	public XMLGregorianCalendar getDateOfBirth() {
+	public void setForeignIDIssuingCountry(String foreignIDIssuingCountry) {
+		this.foreignIDIssuingCountry = foreignIDIssuingCountry;
+	}
+	/*public XMLGregorianCalendar getDateOfBirth() {
+		return DateOfBirth;
+	}*/
+	public String getDateOfBirth() {
 		return DateOfBirth;
 	}
-	public void setDob(XMLGregorianCalendar DateOfBirth) {
+	public void setDob(String DateOfBirth) {
 		this.DateOfBirth = DateOfBirth;
 	}
 	public YesNoCodeType getEmergencyResponder() {
