@@ -11,7 +11,6 @@ public class SOAPConnector extends WebServiceGatewaySupport {
 	public Object callWebService(String url, Object request){
 
 		LOG.info("Sending Web Service Request using WebServiceTemplate...");
-
 		return getWebServiceTemplate().marshalSendAndReceive(url, request);
 	}
 }

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import gov.hhs.induction.InductionResponse;
 
-
 /**
  * @author prabhjyot.virdi
  * This class as main controller class for the

@@ -5,7 +5,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.springframework.beans.factory.annotation.Value;
 
@@ -149,10 +148,10 @@ public class InductionRequest {
 	public void setForeignIDNumber(String foreignIDNumber) {
 		this.foreignIDNumber = foreignIDNumber;
 	}
-	/*public CountryCodeType getForeignIDIssuingCountry() {
+	public CountryCodeType getForeignIDIssuingCountry() {
 		return CountryCodeType.fromValue(foreignIDIssuingCountry);
-	}*/
-	public String getForeignIDIssuingCountry() {
+	}
+	public String getForeignIDIssuingCountryAsString() {
 		return foreignIDIssuingCountry;
 	}
 	public void setForeignIDIssuingCountry(String foreignIDIssuingCountry) {
