@@ -40,7 +40,8 @@ public class InductionRequest {
     private String foreignIDIssuingCountry;   
     @XmlElement(name = "DOB", required = true)
     @XmlSchemaType(name = "date")
-    private XMLGregorianCalendar DateOfBirth;
+    //private XMLGregorianCalendar DateOfBirth;
+    private String DateOfBirth;
     //@XmlElement(name = "EmergencyResponder")
     //@XmlSchemaType(name = "string")
     @Value("${request.emergencyResponder}")
@@ -86,7 +87,7 @@ public class InductionRequest {
 	
 	
 	public InductionRequest(boolean personSponsored, String firstName, String lastName, String ssn, String arn,
-			String visaNumber, String foreignIDNumber, String foreignIDIssuingCountry, XMLGregorianCalendar dateOfBirth,
+			String visaNumber, String foreignIDNumber, String foreignIDIssuingCountry, String dateOfBirth,
 			String emergencyResponder, String organization, String opdiv, String affiliationCode,
 			String credentialCategory) {
 		this.personSponsored = String.valueOf(personSponsored);
@@ -148,16 +149,22 @@ public class InductionRequest {
 	public void setForeignIDNumber(String foreignIDNumber) {
 		this.foreignIDNumber = foreignIDNumber;
 	}
-	public CountryCodeType getForeignIDIssuingCountry() {
-		return CountryCodeType.valueOf(foreignIDIssuingCountry);
+	/*public CountryCodeType getForeignIDIssuingCountry() {
+		return CountryCodeType.fromValue(foreignIDIssuingCountry);
+	}*/
+	public String getForeignIDIssuingCountry() {
+		return foreignIDIssuingCountry;
 	}
-	public void setForeignIDIssuingCountry(CountryCodeType foreignIDIssuingCountry) {
-		this.foreignIDIssuingCountry = foreignIDIssuingCountry.name();
+	public void setForeignIDIssuingCountry(String foreignIDIssuingCountry) {
+		this.foreignIDIssuingCountry = foreignIDIssuingCountry;
 	}
-	public XMLGregorianCalendar getDateOfBirth() {
+	/*public XMLGregorianCalendar getDateOfBirth() {
+		return DateOfBirth;
+	}*/
+	public String getDateOfBirth() {
 		return DateOfBirth;
 	}
-	public void setDob(XMLGregorianCalendar DateOfBirth) {
+	public void setDob(String DateOfBirth) {
 		this.DateOfBirth = DateOfBirth;
 	}
 	public YesNoCodeType getEmergencyResponder() {
