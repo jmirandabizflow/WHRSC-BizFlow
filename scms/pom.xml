@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>gov.hhs.induction</groupId>
-	<artifactId>InductionClient</artifactId>
+	<groupId>gov.hhs</groupId>
+	<artifactId>scmsswsc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>Induction Client</name>
-	<description>SOAP Client for SCMS Induction Web Service</description>
+	<name>SCMS SOAP Web Service Client</name>
+	<description>SOAP Client for Smart Card Management System' Induction Web Service</description>
 
 	<!-- <repositories> <repository> <id>project.lib.local</id> <name>In-project 
 		repository to configure dependent jars for build</name> <url>file://${project.basedir}/lib</url> 
@@ -26,6 +26,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.7</java.version>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
 	<dependencies>
@@ -33,8 +36,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web-services</artifactId>
 		</dependency>
-
-		<!--************************ -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -43,7 +44,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-loader</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
@@ -54,128 +54,61 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 		</dependency>
-		<!--************************ -->
 
-
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<!--Added to return XML response -->
-		<!-- <dependency> <groupId>com.fasterxml.jackson.dataformat</groupId> <artifactId>jackson-dataformat-xml</artifactId> 
-			</dependency> -->
+		</dependency> -->
+
 	</dependencies>
 
 	<build>
 		<plugins>
-		
-		<!-- Run install-file goal to include 3rd party jars to local project 
-				repository for build. This should be executed by calling clean goal. It is 
-				to avoid error by dependency checking done before running goals in plugin 
-				in normal validate cycle. mvn clean -->
-			
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>2.5.2</version>
-				<executions>
-					<execution>
-						<id>install-commons-logging-jar-lib</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<phase>clean</phase>
-						<configuration>
-							<file>${project.basedir}/lib/commons-logging-1.1.2.jar</file>
-							<groupId>proj.lib.local</groupId>
-							<artifactId>commons-logging</artifactId>
-							<version>1.1</version>
-							<packaging>jar</packaging>
-							<localRepositoryPath>${project.basedir}/lib</localRepositoryPath>
-						</configuration>
-					</execution>
-					<execution>
-						<id>install-log4j-jar-lib</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<phase>clean</phase>
-						<configuration>
-							<file>${project.basedir}/lib/log4j-1.2.8.jar</file>
-							<groupId>proj.lib.local</groupId>
-							<artifactId>log4j</artifactId>
-							<version>1.2.8</version>
-							<packaging>jar</packaging>
-							<localRepositoryPath>${project.basedir}/lib</localRepositoryPath>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> -->
-			
-		
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 
-			<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.13.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<args>
-						<arg>-XautoNameResolution</arg><!-- Added to handle exception: A class/interface 
-							with the same name is already in use. Use a class customization to resolve 
-							this conflict. -->
-					</args>
-					<generatePackage>gov.hhs.induction.schemas</generatePackage>
-					<generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-					<schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory>
-					<schemaIncludes>
-						<include>*.wsdl</include>
-					</schemaIncludes>
-					<!--Binding file added to raise theEnumMemberSizeCap limit -->
-					<bindings>
-						<binding>
-							<fileset>
-								<directory>${project.basedir}/src/main/resources</directory>
-								<includes>
-									<include>bindings.xjb</include>
-								</includes>
-							</fileset>
-						</binding>
-					</bindings>
-					<!-- -->
-				</configuration>
-			</plugin>
-
+			<!-- <plugin> <groupId>org.jvnet.jaxb2.maven2</groupId> <artifactId>maven-jaxb2-plugin</artifactId> 
+				<version>0.13.2</version> <executions> <execution> <id>generate-wsdl-schema</id> 
+				<goals> <goal>generate</goal> </goals> <configuration> <args> <arg>-XautoNameResolution</arg>Added 
+				to handle exception: A class/interface with the same name is already in use. 
+				Use a class customization to resolve this conflict. </args> <generatePackage>gov.hhs.induction.schemas</generatePackage> 
+				<clearOutputDir>false</clearOutputDir> <generateDirectory>${project.basedir}/src/main/java</generateDirectory> 
+				<schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory> 
+				<schemaIncludes> <include>*.wsdl</include> </schemaIncludes> Binding file 
+				added to raise theEnumMemberSizeCap limit <xjbSources> <xjbSource>${project.basedir}/src/main/resources/xjb/bindings.xjb</xjbSource> 
+				</xjbSources> <bindingDirectory>${project.basedir}/src/main/resources/xjb</bindingDirectory> 
+				<bindingIncludes> <include>bindings.xjb</include> </bindingIncludes> <bindings> 
+				<binding> <fileset> <directory>${project.basedir}/src/main/resources</directory> 
+				<includes> <include>bindings.xjb</include> </includes> </fileset> </binding> 
+				</bindings> <jaxbBindingFiles> TODO: Have binding files? Add them here <jaxbBindingFile>${project.basedir}/src/main/resources/xjb/bindings.xjb</jaxbBindingFile> 
+				</jaxbBindingFiles> </configuration> </execution> <execution> <id>generate-xsd-schema</id> 
+				<goals> <goal>generate</goal> </goals> <configuration> <args> <arg>-XautoNameResolution</arg>Added 
+				to handle exception: A class/interface with the same name is already in use. 
+				Use a class customization to resolve this conflict. </args> <generatePackage>gov.hhs.induction.schemas</generatePackage> 
+				<clearOutputDir>false</clearOutputDir> <generateDirectory>${project.basedir}/src/main/java</generateDirectory> 
+				<schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory> 
+				<schemaIncludes> <include>*.xsd</include> </schemaIncludes> Binding file 
+				added to raise theEnumMemberSizeCap limit <bindingDirectory>${project.basedir}/src/main/resources/xjb</bindingDirectory> 
+				<bindingIncludes> <include>bindings.xjb</include> </bindingIncludes> <bindings> 
+				<binding> <fileset> <directory>${project.basedir}/src/main/resources</directory> 
+				<includes> <include>bindings.xjb</include> </includes> </fileset> </binding> 
+				</bindings> </configuration> </execution> </executions> </plugin> -->
 
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 
-	
-	<!-- <dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>proj.lib.local</groupId>
-				<artifactId>commons-logging</artifactId>
-				<version>1.1.2</version>
-			</dependency>
-			<dependency>
-				<groupId>proj.lib.local</groupId>
-				<artifactId>log4j</artifactId>
-				<version>1.2.8</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement> -->
-	
 
 </project>
