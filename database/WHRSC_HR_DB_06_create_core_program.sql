@@ -2059,24 +2059,24 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
     V_RYBCODE                   VARCHAR2(50);
     V_RYBSTATUS                 VARCHAR2(50);
     V_RYBDESC                   VARCHAR2(100);
- 	
+
 	BEGIN
 		DBMS_OUTPUT.PUT_LINE('SP_UPDATE_RECRUITMENT_PROCESS - BEGIN ============================');
 		DBMS_OUTPUT.PUT_LINE('PARAMETERS ----------------');
 		DBMS_OUTPUT.PUT_LINE(' ----------------');
-    
+
 		V_XMLDOC := I_FIELD_DATA;
 		IF I_TRANSACTIONID IS NOT NULL AND I_TRANSACTIONID > 0 THEN
 			------------------------------------------------------
 
 			------------------------------------------------------
 			--DBMS_OUTPUT.PUT_LINE('Starting xml data retrieval and table update ----------');
-			
+
       BEGIN
 				--------------------------------
 				-- MAIN table
 				--------------------------------
-        
+
 				MERGE INTO MAIN TRG
 				USING
 				(
@@ -2100,6 +2100,8 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
 						, X.HR_ASSISTANT_ID				
 						, X.HR_SPA
 						, X.HR_SPA_ID
+                        , X.HR_SENIOR_ADVISOR
+						, X.HR_SENIOR_ADVISOR_ID
 						, X.PCKG_COMPLETE
 						, X.MISSING_DOCS
 						, X.MISSING_DOCS_EMAIL_SENT_DATE
@@ -2138,6 +2140,8 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
 								 ,HR_ASSISTANT_ID					VARCHAR2(10) PATH 'TRANSACTION/HR_ASSISTANT_ID'
 								,HR_SPA								VARCHAR2(100) PATH 'TRANSACTION/HR_SPA'
 								, HR_SPA_ID							VARCHAR2(10) PATH 'TRANSACTION/HR_SPA_ID'
+                                ,HR_SENIOR_ADVISOR								VARCHAR2(100) PATH 'TRANSACTION/HR_SENIOR_ADVISOR'
+								, HR_SENIOR_ADVISOR_ID							VARCHAR2(10) PATH 'TRANSACTION/HR_SENIOR_ADVISOR_ID'
 								,PCKG_COMPLETE					VARCHAR2(3) PATH 'TRANSACTION/PCKG_COMPLETE'
 								,MISSING_DOCS						varchar2(4000)  PATH 'TRANSACTION/MISSING_DOCS'
 								 ,MISSING_DOCS_EMAIL_SENT_DATE	DATE PATH 'TRANSACTION/MISSING_DOCS_EMAIL_SENT_DATE'
@@ -2175,6 +2179,8 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
           , TRG.HR_ASSISTANT_ID = SRC.HR_ASSISTANT_ID
           , TRG.HR_SPA = SRC.HR_SPA 
           , TRG.HR_SPA_ID = SRC.HR_SPA_ID 
+          , TRG.HR_SENIOR_ADVISOR = SRC.HR_SENIOR_ADVISOR 
+          , TRG.HR_SENIOR_ADVISOR_ID = SRC.HR_SENIOR_ADVISOR_ID 
           , TRG.PCKG_COMPLETE = SRC.PCKG_COMPLETE
           , TRG.MISSING_DOCS = SRC.MISSING_DOCS
           , TRG.MISSING_DOCS_EMAIL_SENT_DATE = SRC.MISSING_DOCS_EMAIL_SENT_DATE
@@ -2211,6 +2217,8 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
                 , TRG.HR_ASSISTANT_ID
                 , TRG.HR_SPA 
                 , TRG.HR_SPA_ID 
+                , TRG.HR_SENIOR_ADVISOR 
+                , TRG.HR_SENIOR_ADVISOR_ID 
                 , TRG.PCKG_COMPLETE
                 , TRG.MISSING_DOCS
                 , TRG.MISSING_DOCS_EMAIL_SENT_DATE
@@ -2248,6 +2256,8 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
                 , SRC.HR_ASSISTANT_ID
                 , SRC.HR_SPA 
                 , SRC.HR_SPA_ID 
+                , SRC.HR_SENIOR_ADVISOR 
+                , SRC.HR_SENIOR_ADVISOR_ID 
                 , SRC.PCKG_COMPLETE
                 , SRC.MISSING_DOCS
                 , SRC.MISSING_DOCS_EMAIL_SENT_DATE
@@ -2265,19 +2275,19 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
                 ,SRC.SUBMITTED_PCKG_QLTY_COMMENTS
               )
               ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, 'SP_UPDATE_MAIN_TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
 			END;
-      
+
       BEGIN
 				--------------------------------
 				-- IC_REQUEST_INFO table
 				--------------------------------
-        
+
 				MERGE INTO IC_REQUEST_INFO TRG
 				USING
 				(
@@ -2292,7 +2302,7 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
             ,X.SUPERVISOR_FIRST_NAME
             ,X.SUPERVISOR_LAST_NAME	
             ,X.SUPERVISOR_EMAIL			
-           
+
          	 FROM TBL_FORM_DTL FD  
 						, XMLTABLE('/DOCUMENT'
 							PASSING FD.FIELD_DATA
@@ -2347,19 +2357,19 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
             ,SRC.SUPERVISOR_EMAIL			
           )
           ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, 'SP_UPDATE_IC_REQUEST_INFO_TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
 			END;
-	
-	      BEGIN
+
+      BEGIN
 				--------------------------------
 				-- NEW_POSITION table
 				--------------------------------
-        
+
 				MERGE INTO NEW_POSITION TRG
 				USING
 				(
@@ -2403,19 +2413,19 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
             ,SRC.GRADE
           )
           ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, 'NEW_POSITION TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
-			END; 	
+			END; 
 
 	   BEGIN
 				--------------------------------
 				-- RECRUITMENT table
 				--------------------------------
-        
+
 				MERGE INTO RECRUITMENT TRG
 				USING
 				(
@@ -2445,7 +2455,7 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
            ,X.DATE_REC_PCKG_SENT_DEU
            ,X.DATE_REC_PCKG_SENT_APPROVED
            ,X.REC_PCKG_NOTES
-  
+
          	 FROM TBL_FORM_DTL FD  
 						, XMLTABLE('/DOCUMENT'
 							PASSING FD.FIELD_DATA
@@ -2475,7 +2485,7 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
                                 ,DATE_REC_PCKG_SENT_DEU							DATE  PATH 'PRERECRUITMENT/DATE_REC_PCKG_SENT_DEU'
                                 ,DATE_REC_PCKG_SENT_APPROVED					DATE  PATH 'PRERECRUITMENT/DATE_REC_PCKG_SENT_APPROVED'
                                 ,REC_PCKG_NOTES	
-	
+
 						) X
 					WHERE X.TRANSACTION_ID = I_TRANSACTIONID
 				) SRC ON (SRC.TRANSACTION_ID = TRG.TRANSACTION_ID)
@@ -2504,7 +2514,7 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
                   ,TRG.DATE_REC_PCKG_SENT_DEU = SRC.DATE_REC_PCKG_SENT_DEU
                   ,TRG.DATE_REC_PCKG_SENT_APPROVED = SRC.DATE_REC_PCKG_SENT_APPROVED
                   ,TRG.REC_PCKG_NOTES = SRC.REC_PCKG_NOTES
-          
+
         WHEN NOT MATCHED THEN INSERT
         (
           TRG.TRANSACTION_ID
@@ -2532,7 +2542,7 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
           ,TRG.DATE_REC_PCKG_SENT_DEU
           ,TRG.DATE_REC_PCKG_SENT_APPROVED
           ,TRG.REC_PCKG_NOTES
-          
+
         )
         VALUES
         (
@@ -2563,7 +2573,7 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
         ,SRC.REC_PCKG_NOTES
       )
       ;      
-        
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, 'SP_UPDATE_RECRUITMENT_TABLE: Invalid TRANSACTION data.  I_TRANSACTIONID = '
@@ -2573,10 +2583,10 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
     -- Multi Select Insert
     -------------------------------------------
     ---SP_UPDATE_MULTI_SELECT(I_TRANSACTIONID, I_FORM_NAME, I_FIELD_NAME, I_TABLE_NAME);
-    
+
     SP_UPDATE_MULTI_SELECT(I_TRANSACTIONID, 'RECRUITMENT', 'INCENTIVES_OFFERED', 'RECRUITMENT');
     SP_UPDATE_MULTI_SELECT(I_TRANSACTIONID, 'RECRUITMENT', 'ADDITIONAL_RECRUIT_CHANNELS', 'RECRUITMENT');
-	
+
       BEGIN  
       	--------------------------------
 		-- MAIN AND RECRUITMENT_ACTION_STATUS table
@@ -2587,7 +2597,7 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
           UPDATE RECRUITMENT_ACTION_STATUS SET ANN_OPENED = V_VALUE 
           WHERE TRANSACTION_ID = I_TRANSACTIONID;  
         END IF;
-        
+
         V_XMLVALUE :=I_FIELD_DATA.EXTRACT('/DOCUMENT/MAIN/UPDATE_STATUS/text()');
         IF V_XMLVALUE IS NOT NULL THEN
           V_UPDATESTATUS := V_XMLVALUE.GETSTRINGVAL();
@@ -2599,7 +2609,7 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
             V_STATUSDATE := TO_DATE(V_VALUE,'YYYY/MM/DD HH24:MI:SS');
             V_XMLVALUE := I_FIELD_DATA.EXTRACT('/DOCUMENT/MAIN/STATUS_USER_ID/text()');
             V_STATUSUSERID := V_XMLVALUE.GETSTRINGVAL();
-            
+
             UPDATE MAIN SET STATUS = V_STATUS, STATUS_DATE = V_STATUSDATE, STATUS_USER_ID = V_STATUSUSERID 
             WHERE TRANSACTION_ID = I_TRANSACTIONID;
           END IF;   
@@ -2614,14 +2624,14 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
             V_RYBSTATUS := V_XMLVALUE.GETSTRINGVAL();
             V_XMLVALUE := I_FIELD_DATA.EXTRACT('/DOCUMENT/MAIN/RYB_DESC/text()');
             V_RYBDESC := V_XMLVALUE.GETSTRINGVAL();
-           
+
             UPDATE MAIN SET RYB_CODE = V_RYBCODE, RYB_STATUS = V_RYBSTATUS, RYB_DESCRIPTION = V_RYBDESC 
             WHERE TRANSACTION_ID = I_TRANSACTIONID;
           END IF;
         END IF;
-        
+
       END;
-   
+
 
 		END IF;
 
@@ -2638,7 +2648,8 @@ create or replace PROCEDURE SP_UPDATE_RECRUITMENT_PROCESS
 			--DBMS_OUTPUT.PUT_LINE('Error code    = ' || V_ERRCODE);
 			--DBMS_OUTPUT.PUT_LINE('Error message = ' || V_ERRMSG);
 	END;
-/
+
+	/
 --------------------------------------------------------
 --  DDL for Procedure SP_UPDATE_APPOINTMENT_PROCESS
 --------------------------------------------------------
@@ -2666,24 +2677,24 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
     V_RYBSTATUS                 VARCHAR2(50);
     V_RYBDESC                   VARCHAR2(100);
     V_UPDATESPA                 VARCHAR2(4);
-	
+
 	BEGIN
 		DBMS_OUTPUT.PUT_LINE('SP_UPDATE_APPOINTMENT_PROCESS - BEGIN ============================');
 		DBMS_OUTPUT.PUT_LINE('PARAMETERS ----------------');
 		DBMS_OUTPUT.PUT_LINE(' ----------------');
-    
+
 		V_XMLDOC := I_FIELD_DATA;
 		IF I_TRANSACTIONID IS NOT NULL AND I_TRANSACTIONID > 0 THEN
 			------------------------------------------------------
 
 			------------------------------------------------------
 			--DBMS_OUTPUT.PUT_LINE('Starting xml data retrieval and table update ----------');
-			
+
       BEGIN
 				--------------------------------
 				-- MAIN table
 				--------------------------------
-        
+
 				MERGE INTO MAIN TRG
 				USING
 				(
@@ -2707,6 +2718,8 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
 						, X.HR_ASSISTANT_ID				
 						, X.HR_SPA
 						, X.HR_SPA_ID
+                        , X.HR_SENIOR_ADVISOR
+						, X.HR_SENIOR_ADVISOR_ID
 						, X.PCKG_COMPLETE
 						, X.MISSING_DOCS
 						, X.MISSING_DOCS_EMAIL_SENT_DATE
@@ -2743,6 +2756,8 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
 								 ,HR_ASSISTANT_ID					VARCHAR2(10) PATH 'TRANSACTION/HR_ASSISTANT_ID'
 								,HR_SPA								VARCHAR2(100) PATH 'TRANSACTION/HR_SPA'
 								, HR_SPA_ID							VARCHAR2(10) PATH 'TRANSACTION/HR_SPA_ID'
+                                 ,HR_SENIOR_ADVISOR					VARCHAR2(100) PATH 'TRANSACTION/HR_SENIOR_ADVISOR'
+								, HR_SENIOR_ADVISOR_ID				VARCHAR2(10) PATH 'TRANSACTION/HR_SENIOR_ADVISOR_ID'
 								,PCKG_COMPLETE						VARCHAR2(3) PATH 'TRANSACTION/PCKG_COMPLETE'
 								,MISSING_DOCS						varchar2(4000)  PATH 'TRANSACTION/MISSING_DOCS'
 								 ,MISSING_DOCS_EMAIL_SENT_DATE	DATE PATH 'TRANSACTION/MISSING_DOCS_EMAIL_SENT_DATE'
@@ -2778,6 +2793,8 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
           , TRG.HR_ASSISTANT_ID = SRC.HR_ASSISTANT_ID
           , TRG.HR_SPA = SRC.HR_SPA 
           , TRG.HR_SPA_ID = SRC.HR_SPA_ID 
+          , TRG.HR_SENIOR_ADVISOR = SRC.HR_SENIOR_ADVISOR 
+          , TRG.HR_SENIOR_ADVISOR_ID = SRC.HR_SENIOR_ADVISOR_ID 
           , TRG.PCKG_COMPLETE = SRC.PCKG_COMPLETE
           , TRG.MISSING_DOCS = SRC.MISSING_DOCS
           , TRG.MISSING_DOCS_EMAIL_SENT_DATE = SRC.MISSING_DOCS_EMAIL_SENT_DATE
@@ -2812,6 +2829,8 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
                 , TRG.HR_ASSISTANT_ID
                 , TRG.HR_SPA 
                 , TRG.HR_SPA_ID 
+                , TRG.HR_SENIOR_ADVISOR 
+                , TRG.HR_SENIOR_ADVISOR_ID 
                 , TRG.PCKG_COMPLETE
                 , TRG.MISSING_DOCS
                 , TRG.MISSING_DOCS_EMAIL_SENT_DATE
@@ -2847,6 +2866,8 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
                 , SRC.HR_ASSISTANT_ID
                 , SRC.HR_SPA 
                 , SRC.HR_SPA_ID 
+                , SRC.HR_SENIOR_ADVISOR 
+                , SRC.HR_SENIOR_ADVISOR_ID 
                 , SRC.PCKG_COMPLETE
                 , SRC.MISSING_DOCS
                 , SRC.MISSING_DOCS_EMAIL_SENT_DATE
@@ -2862,19 +2883,19 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
                 --,SRC.SERVICING_TEAM_LEADER_ID
               )
               ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, 'UPDATE MAIN TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
 			END;
-      
+
       BEGIN
 				--------------------------------
 				-- IC_REQUEST_INFO table
 				--------------------------------
-        
+
 				MERGE INTO IC_REQUEST_INFO TRG
 				USING
 				(
@@ -2886,7 +2907,7 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
            ,X.SUPERVISOR_FIRST_NAME
             ,X.SUPERVISOR_LAST_NAME	
             ,X.SUPERVISOR_EMAIL			
-           
+
          	 FROM TBL_FORM_DTL FD  
 						, XMLTABLE('/DOCUMENT'
 							PASSING FD.FIELD_DATA
@@ -2929,19 +2950,19 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
             ,SRC.SUPERVISOR_EMAIL			
           )
           ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, ' UPDATE IC_REQUEST_INFO TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
 			END;
-      
+
       BEGIN
 				--------------------------------
 				-- ANNOUNCEMENT table
 				--------------------------------
-        
+
 				MERGE INTO ANNOUNCEMENT TRG
 				USING
 				(
@@ -2975,19 +2996,19 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
             ,SRC.ANN_NUMBER
           )
           ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, ' UPDATE ANNOUNCEMENT TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
 			END;
-      
+
       BEGIN
 				--------------------------------
 				-- PERSON_INFO table
 				--------------------------------
-        
+
 				MERGE INTO PERSON_INFO TRG
 				USING
 				(
@@ -3067,19 +3088,19 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
             ,SRC.CAPHR_PROCESSED_DATE
           )
           ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, 'UPDATE PERSON_INFO TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
 			END;
-      
+
       BEGIN
 				--------------------------------
 				-- CERTIFICATE table
 				--------------------------------
-        
+
 				MERGE INTO CERTIFICATE TRG
 				USING
 				(
@@ -3138,19 +3159,19 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
             ,SRC.DATE_CERT_EXPIRES
           )
           ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, 'UPDATE CERTIFICATE TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
 			END;
-    
+
       BEGIN
 				--------------------------------
 				-- NEW_POSITION table
 				--------------------------------
-        
+
 				MERGE INTO NEW_POSITION TRG
 				USING
 				(
@@ -3264,19 +3285,19 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
             ,SRC.CATEGORY
           )
           ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, 'NEW_POSITION TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
 			END;
-     
+
       BEGIN
 				--------------------------------
 				-- APPOINTMENT table
 				--------------------------------
-        
+
 				MERGE INTO APPOINTMENT TRG
 				USING
 				(
@@ -3600,30 +3621,30 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
             ,SRC.ARP_STEP_DETERMINATION
           )
           ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, 'APPOINTMENT TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
     END;
-    
+
     -----------------------------------------
     -- Multi Select Insert
     -------------------------------------------
     ---SP_UPDATE_MULTI_SELECT(I_TRANSACTIONID, I_FORM_NAME, I_FIELD_NAME, I_TABLE_NAME);
-    
+
     SP_UPDATE_MULTI_SELECT(I_TRANSACTIONID, 'APPOINTMENT', 'ARP_STEP_DETERMINATION', 'APPOINTMENT');
     SP_UPDATE_MULTI_SELECT(I_TRANSACTIONID, 'APPOINTMENT', 'ARP_JUSTIFICATION', 'APPOINTMENT');
     SP_UPDATE_MULTI_SELECT(I_TRANSACTIONID, 'APPOINTMENT', 'MEDICAL_SPECIALITY', 'APPOINTMENT');
     SP_UPDATE_MULTI_SELECT(I_TRANSACTIONID, 'APPOINTMENT', 'APPOINTEE_REFERRED_BY', 'APPOINTMENT');
 
-    
+
     BEGIN
 				--------------------------------
 				-- ORIENTATION table
 				--------------------------------
-        
+
 				MERGE INTO ORIENTATION TRG
 				USING
 				(
@@ -3677,19 +3698,19 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
             ,SRC.DT_OFFICIAL_OFFER_LETTER_SENT
           )
           ;
-        
-        
+
+
 			EXCEPTION
 				WHEN OTHERS THEN
  					RAISE_APPLICATION_ERROR(-20905, ' UPDATE ORIENTATION TABLE: Invalid data.  I_TRANSACTIONID = '
 						|| TO_CHAR(I_TRANSACTIONID));
 			END;
-      
+
       BEGIN  
       	--------------------------------
 				-- MAIN and SPA_PROCESSING table
 				--------------------------------
-        
+
         V_XMLVALUE := I_FIELD_DATA.EXTRACT('/DOCUMENT/MAIN/STATUS/text()');
         IF V_XMLVALUE IS NOT NULL THEN
           V_STATUS := V_XMLVALUE.GETSTRINGVAL();
@@ -3698,10 +3719,10 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
           V_STATUSDATE := TO_DATE(V_VALUE,'YYYY/MM/DD HH24:MI:SS');
           V_XMLVALUE := I_FIELD_DATA.EXTRACT('/DOCUMENT/MAIN/STATUS_USER_ID/text()');
           V_STATUSUSERID := V_XMLVALUE.GETSTRINGVAL();
-          
+
           UPDATE MAIN SET STATUS = V_STATUS, STATUS_DATE = V_STATUSDATE, STATUS_USER_ID = V_STATUSUSERID 
           WHERE TRANSACTION_ID = I_TRANSACTIONID;
-            
+
         END IF;
         V_XMLVALUE := I_FIELD_DATA.EXTRACT('/DOCUMENT/MAIN/UPDATE_SENT_SPA/text()');
         IF V_XMLVALUE IS NOT NULL THEN
@@ -3732,11 +3753,11 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
              ,SYSDATE        
             )
             ;
-            
+
           END IF;
         END IF;
         V_XMLVALUE := I_FIELD_DATA.EXTRACT('/DOCUMENT/MAIN/UPDATE_RYB/text()');
-        
+
         IF V_XMLVALUE IS NOT NULL THEN
           V_UPDATERYB := V_XMLVALUE.GETSTRINGVAL();
           IF V_UPDATERYB = 'true' THEN           
@@ -3746,10 +3767,10 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
             V_RYBSTATUS := V_XMLVALUE.GETSTRINGVAL();
             V_XMLVALUE := I_FIELD_DATA.EXTRACT('/DOCUMENT/MAIN/RYB_DESC/text()');
             V_RYBDESC := V_XMLVALUE.GETSTRINGVAL();
-           
+
             UPDATE MAIN SET RYB_CODE = V_RYBCODE, RYB_STATUS = V_RYBSTATUS, RYB_DESCRIPTION = V_RYBDESC 
             WHERE TRANSACTION_ID = I_TRANSACTIONID;
-          
+
            END IF;
         END IF;
       END;
@@ -3769,8 +3790,8 @@ create or replace PROCEDURE SP_UPDATE_APPOINTMENT_PROCESS
 			--DBMS_OUTPUT.PUT_LINE('Error code    = ' || V_ERRCODE);
 			--DBMS_OUTPUT.PUT_LINE('Error message = ' || V_ERRMSG);
 	END;
-/
 
+	/
 --------------------------------------------------------
 --  DDL for Procedure SP_UPDATE_FORM_DATA
 --------------------------------------------------------
