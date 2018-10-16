@@ -1,0 +1,16 @@
+[Production Deploy Instruction]
+1. Download "Prod Release Oct 19 Package" folder from WHRSC-BizFlow\deploy
+2. Datebase Deployment and run the following sql script files
+	2.1. Using the HHS_WHRSC_HR user login, execute the following script:
+		WHRSC_HR_DB_UPD_01_ddl_program.sql
+	2.2. Using the HHS_HR user login, execute the following script:
+		HHS_HR_DB_01_table_ddl.sql
+	2.3. Using the Oracle system user login, execute the following script:
+		HHS_HR_DB_02_table_permission.sql
+	2.4. Using the HHS_HR user login, execute the following script:
+		HHS_HR_DB_03_insert_seed_data_HHS_LIST_MANAGER_LOOKUP.sql
+		
+3. BIX Deployment
+	Open BPS and run import option for whrsc.bix
+4. Web Application (UI Module) Deployment
+	Deploy runtime.zip on HHS Prod
