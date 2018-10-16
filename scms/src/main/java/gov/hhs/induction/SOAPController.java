@@ -37,6 +37,7 @@ public class SOAPController
 	@ResponseBody
 	public InductionResponse getResponse(@RequestBody InductionRequest inductionRequest)
 	{
+		LOG.info("CLIENT REQUEST RECEIVED TO INDUCT NEW PERSON.");
 		InductionResponse inductionResponse = new InductionResponse();
 		if(inductionRequest.getFirstName().isEmpty() || inductionRequest.getLastName().isEmpty()){
 			LOG.info("CLIENT REQUEST RECEIVED :: Invalid FirstName and/or LastName.");
