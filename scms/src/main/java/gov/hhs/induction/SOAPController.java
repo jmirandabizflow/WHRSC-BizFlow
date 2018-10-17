@@ -14,11 +14,11 @@ import gov.hhs.induction.InductionResponse;
 /**
  * @author prabhjyot.virdi
  * This class as main controller class for the
- * SCMS SOAP Client application. 
+ * Smart Card Management System SOAP Web Service Client SOAP Client application. 
  *
  */
 @Controller
-@RequestMapping({"/scmsswsc"})//Smart Card Management System SOAP Web Service Client
+@RequestMapping({"/induction"})
 public class SOAPController
 {
 	private static final Log LOG = LogFactory.getLog(SOAPController.class);
