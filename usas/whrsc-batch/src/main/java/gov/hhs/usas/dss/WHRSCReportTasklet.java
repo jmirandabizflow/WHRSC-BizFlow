@@ -83,7 +83,7 @@ public class WHRSCReportTasklet implements Tasklet{
 				log.info("Time taken for downloading " + report.getReportName() + " data: " + time + "ms");
 				
 				if (errCnt > 0) {
-					errMsg = "The report " + report.getReportName() + " did not retrieve data for " + errCnt + " report iteration(s).";
+					errMsg = "The report " + report.getReportName() + " did not retrieve data for this report iteration.";
 					log.info(errMsg);
 				    contribution.setExitStatus(new ExitStatus(ExitStatus.FAILED.getExitCode(), errMsg));
 				    chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(report.getReportName(), properties.getReportErrorMessage());
